@@ -1,13 +1,16 @@
 # modelo-dao-php
-    Este respositorio empezo siendo un proyecto de un blog profesional y pienso en el desarrollo de una herramienta reutilizable de código para la funcionalidad de una aplicación web con php respecto a la gestión de rutas, insercción, actualización y muestra de los datos en MySQL por defecto siguiendo una orientación POO y una arquitectura Modelo Vista Controlador.
+Este respositorio empezo siendo un proyecto de un blog profesional y pienso en el desarrollo de una herramienta reutilizable de código para la funcionalidad de una aplicación web con php respecto a la gestión de rutas, insercción, actualización y muestra de los datos en MySQL por defecto siguiendo una orientación POO y una arquitectura Modelo Vista Controlador.
 
 # Requerimientos
-    mod_headers Apache 2.4^ [enable]
-    rewrite Apache 2.4^ [enable]
-    php 8.0^
+- Apache 2.4
+- Mod_headers Apache 2.4^ <span style="color:green">enable</span>
+- Rewrite Apache 2.4^ <span style="color:green">enable</span>
+- php 8.0^
+
 
 # Estrcuturación del proyecto
-    La idea es trabajar con una orientación POO por lo tanto dependeremos del objeto Route para gestionar las rutas junto con los métodos, permisos necesarios en las solicitudes HTTP.
+La idea es trabajar con una orientación POO por lo tanto dependeremos del objeto \
+Route para gestionar las rutas junto con los métodos, permisos necesarios en las solicitudes HTTP.
 
 # Indice
 1. Dependencias necesarias
@@ -29,14 +32,37 @@
 
 # Dependencias
 ## Trait Gestor Rutas
-    Este trait agrupará los métodos necesarios para gestionar las rutas, separandolas y comprobando que sus partes son iguales, además de identificar los parámetros $_GET mandados al servidor.
+Este trait agrupará los métodos necesarios para gestionar las rutas, separandolas y \
+comprobando que sus partes son iguales, además de identificar los parámetros $_GET mandados al servidor.
 
 ## Interfaz Controller
-    Esta interfaz obligará a todos los objetos que la implementen a contener un método index, create, update y delete que asegura la implementación de un CRUD básico
+Esta interfaz obligará a todos los objetos que la implementen \
+a contener un método index, create, update y delete \
+que asegura la implementación de un CRUD básico.
+
 
 # Interfaz Singelton
-    Esta otra interfaz es 
+Esta otra interfaz encargada de asegurar la implementación de un método que asegura que se usa una única instancia.
+
+```php
+    class Persona implements Singelton {
+
+        private static ?Persona $instancia = null;
+
+        private __construct(){}
+
+        public static function getInstance():?object {
+            if(self::$instancia === null){
+                self::$instancia = new Persona();
+            }
+
+            return self::$instancia;
+        }
+    }
+```
+
 # Objeto Route
+
 # Objeto Request
 # Objeto Session
 # Objeto Openssl
