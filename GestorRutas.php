@@ -6,6 +6,8 @@
      * Trait usado para la separación y comprobación de las rutas personalizadas
      */
     trait GestorRutas {
+
+        use GestorStrings;
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * @static
@@ -38,7 +40,7 @@
             $numConcidenciasReq = count($partesRutaReq);
             $numConincidenciasEnv = count($partesRutaEnv);
 
-            if(existenCoincidencias("/\(.*\)/",$rutaEnv)){
+            if(self::existenCoincidencias("/\(.*\)/",$rutaEnv)){
                 if($numConincidenciasEnv > $numConcidenciasReq && $numConcidenciasReq != $numConincidenciasEnv){
                     $numConincidenciasEnv -= 1;
                 }
@@ -61,7 +63,7 @@
          * @return bool
          */
         public static function tieneParametros(string $ruta): bool {
-            return existenCoincidencias("/\{.*\}|\(.*\)/", $ruta);
+            return self::existenCoincidencias("/\{.*\}|\(.*\)/", $ruta);
         }
 
         /**

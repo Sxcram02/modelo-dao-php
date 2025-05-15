@@ -12,6 +12,7 @@ use Src\App\Database;
      * Clase abstracta que será usada por los modelos para obtener, crear y modificar los registros de la base de datos con los controladores.
      */
     abstract class Modelo {
+        use GestorStrings;
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * Cadena de texto con la indicas el nombre de la tabla si el nombre de la clase no corresponde con esta.
@@ -80,7 +81,7 @@ use Src\App\Database;
             // Formateo el nombre de la clase Usuarios -> usuarios
             $tabla = strtolower(substr($this::class, 11, strlen($this::class)));
 
-            if (!esCadenaTextoValida(cadena: $tabla)) {
+            if (!self:: esCadenaTextoValida(cadena: $tabla)) {
                 throw new \Exception(message: 'No se encuentra la tabla en la BBDD');
             }
 
@@ -294,9 +295,9 @@ use Src\App\Database;
             }
             
             if (is_string($columnas)){
-                $selecionaTodo = existenCoincidencias("#\*#",$columnas);
-                if(!$selecionaTodo && existenCoincidencias("/,:;-/", $columnas)) {
-                    $datos = separarString($columnas);
+                $selecionaTodo = self::self::existenCoincidencias("#\*#",$columnas);
+                if(!$selecionaTodo && self::self::existenCoincidencias("/,:;-/", $columnas)) {
+                    $datos = self::separarString($columnas);
                 }
             }else{
                 $selecionaTodo = in_array('*',$columnas);
@@ -401,7 +402,7 @@ use Src\App\Database;
          */
         public function join(string $tablaUnida, string|array $clavesForaneas): ?object {
             $tablaOriginal = $this -> formatTabla();
-            $separador = buscarString(' ',$tablaOriginal);
+            $separador = self::buscarString(' ',$tablaOriginal);
             $abreviacionTablaOriginal = substr($tablaOriginal, $separador + 1, 3);
 
             $abreviaturas = [];
@@ -413,7 +414,7 @@ use Src\App\Database;
             }
 
             // tabla1 tb1
-            if (existenCoincidencias("/\s[a-z]{3}/", $tablaUnida, $abreviaturas)) {
+            if (self::self::existenCoincidencias("/\s[a-z]{3}/", $tablaUnida, $abreviaturas)) {
                 $abreviacionTablaUnida = trim($abreviaturas[0]);
             } else {
                 $tablaUnida =  "$tablaUnida $abreviacionTablaUnida";
@@ -425,7 +426,7 @@ use Src\App\Database;
             }
 
             if (!is_array($clavesForaneas)) {
-                $clavesForaneas = separarString($clavesForaneas);
+                $clavesForaneas = self::separarString($clavesForaneas);
             }
 
             if (estaArrayVacio(array: $clavesForaneas)) {
@@ -439,7 +440,7 @@ use Src\App\Database;
             // Omitimos la clausula where
             if (str_contains($consulta, 'WHERE')) {
                 $indiceWhere = strpos($consulta,'WHERE');
-                $consulta = substr($consulta, 0, $indiceWhere + 1);
+                $consulta = substr( $consulta, 0, $indiceWhere + 1);
             }
 
             $consulta .= " JOIN $tablaUnida ON $clavesForaneas[0] = $clavesForaneas[1]";
@@ -465,8 +466,8 @@ use Src\App\Database;
          */
         public function where(string|array $columnas, string|array $operador, mixed $condicion): object {
             foreach(func_get_args() as $parametro){
-                if (is_string($parametro) && !estaCifrada($parametro)) {
-                    $parametro = separarString($parametro);
+                if (is_string($parametro) && !self::estaCifrada($parametro)) {
+                    $parametro = self::separarString($parametro);
                 }
             }
 
@@ -538,7 +539,7 @@ use Src\App\Database;
             $columnas = $this -> columnas;
             $datos = [];
             foreach($columnas as $columna){
-                if(!existenCoincidencias("/_at$|^\bid.*\b/i",$columna)){
+                if(!self::existenCoincidencias("/_at$|^\bid.*\b/i",$columna)){
                     $datos[$columna] = $this -> $columna;
                 }
             }
@@ -730,11 +731,11 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @private
          * execute
          * Método que ejecuta las consultas y retorna el resultado en una Coleccion o un Modelo si encuentra resultados
-         * @return object | false
+         * @return object|false
+         * @private
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function execute(): object|false {
             $db = self::$database;
@@ -754,7 +755,7 @@ use Src\App\Database;
             if (!$query) {
                 return false;
             }
-
+            
             $registros = $query->fetchAll(\PDO::FETCH_ASSOC);
             if(count($registros) <= 0){
                 return false;
@@ -838,7 +839,7 @@ use Src\App\Database;
                 $resultados = $query->fetchAll(\PDO::FETCH_ASSOC);
 
                 foreach ($resultados as $resultado) {
-                    if(existenCoincidencias("/PRI/",$resultado['Key'])){
+                    if(self::existenCoincidencias("/PRI/",$resultado['Key'])){
                         $ids[] = $resultado['Field'];
                     }
                 }

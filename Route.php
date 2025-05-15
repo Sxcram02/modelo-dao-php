@@ -16,8 +16,7 @@ use Src\App\Logs;
  * @use GestorRutas
  */
 class Route implements Singelton {
-
-    use GestorRutas;
+    use GestorStrings;
     
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -602,7 +601,7 @@ class Route implements Singelton {
         foreach ($rutasConSesion as $rolImpuesto => $ruta) {
             if (self::sonMismaRuta( $rutaEnv,$ruta,true)) {
                 $rolNecesario = $rolImpuesto;
-                $rolNecesario = separarString($rolNecesario,'/\|/');
+                $rolNecesario = self::separarString($rolNecesario,'/\|/');
             }
         }
 
@@ -653,11 +652,12 @@ class Route implements Singelton {
         $sonLaMismaRuta = false;
         $tieneSesion = false;
         $tieneAccesoPermitido = true;
+        $tieneRol = false;
 
         $rutaEnv ??= $this -> rutaRegistrada;
         $rutaReq = $_SERVER["REQUEST_URI"];
 
-        $esRutaDeArchivo = existenCoincidencias("/\.[pdf|jpeg|png|php|html|js|jpg|gif|txt|xhtml|yml|xml]$/",$rutaReq);
+        $esRutaDeArchivo = self::existenCoincidencias("/\.[pdf|jpeg|png|php|html|js|jpg|gif|txt|xhtml|yml|xml]$/",$rutaReq);
 
         if ($esRutaDeArchivo) {
             return false;
@@ -684,7 +684,7 @@ class Route implements Singelton {
 
         if($tieneAccesoPermitido && $tieneRol){
             $rol = $this -> sesion -> get('_typeRol');
-            $tieneAccesoPermitido = $this -> esRolValido($rol,$rutaEnv);
+            $tieneAccesoPermitido = !isset($rol) ? false : $this -> esRolValido($rol,$rutaEnv);
         }
 
         if($sonLaMismaRuta && !$tieneAccesoPermitido){
@@ -718,11 +718,11 @@ class Route implements Singelton {
     private static function esMetodoValido(string $metodo): bool {
         $metodoActual = $_SERVER["REQUEST_METHOD"];
 
-        if(!existenCoincidencias("/put|post|get|head|delete/i",$metodoActual)){
+        if(!self::existenCoincidencias("/put|post|get|head|delete/i",$metodoActual)){
             return false;
         }
 
-        if(existenCoincidencias("/post|put/i",$metodoActual)){
+        if(self::existenCoincidencias("/post|put/i",$metodoActual)){
             $datosCabecera = file_get_contents('php://input');
             $datosPorCabecera = json_decode($datosCabecera != false ? $datosCabecera : "{}", true);
 
@@ -739,12 +739,12 @@ class Route implements Singelton {
                 return false;
             }
 
-            if(!existenCoincidencias("/put|delete|post/i",$metodoActual)){
+            if(!self::existenCoincidencias("/put|delete|post/i",$metodoActual)){
                 return false;
             }
         }
 
-        if(!existenCoincidencias("/$metodo/i",$metodoActual)){
+        if(!self::existenCoincidencias("/$metodo/i",$metodoActual)){
             return false;
         }
 

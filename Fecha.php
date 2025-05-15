@@ -240,5 +240,39 @@
 
             return $this -> getDiffSegundos();
         }
+
+
+    public function formatearFecha(){
+        $fechaFormateada = $this->fecha->format('D,d,M,Y');
+        $fechaFormateada = explode(',', $fechaFormateada);
+
+        $nombreDia = match ($fechaFormateada[0]) {
+            "Mon" => "Lunes",
+            "Tue" => "Martes",
+            "Wed" => "Miércoles",
+            "Thu" => "Jueves",
+            "Fri" => "Viernes",
+            "Sat" => "Sábado",
+            "Sun" => "Domingo",
+            default => ""
+        };
+
+        $nombreMes = match ($fechaFormateada[2]) {
+            "Jan" => "Enero",
+            "Feb" => "Febrero",
+            "Mar" => "Marzo",
+            "Apr" => "Abril",
+            "May" => "Mayo",
+            "Jun" => "Junio",
+            "Jul" => "Julio",
+            "Ago" => "Agosto",
+            "Sep" => "Septiembre",
+            "Nov" => "Noviembre",
+            "Dec" => "Diciembre",
+            default => ""
+        };
+
+        return "$nombreDia, $fechaFormateada[1] de $nombreMes en $fechaFormateada[3]";
+    }
     }
 ?>

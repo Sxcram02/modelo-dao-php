@@ -152,6 +152,9 @@
                     ]
                 );
 
+                $conexionDB ->exec("SET NAMES 'utf8mb4'");
+
+
                 $datosDB->__set(atributo: 'pdo', propiedad: $conexionDB);
                 self::$conexion = $datosDB;
                 // Esto es por testeo

@@ -6,6 +6,7 @@
 	 * Objeto usado para la validación de datos
 	 */
 	class Filtro {	
+		use GestorStrings;
 		/**
 		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * Array con los errores encontrados en la svalidaciones
@@ -56,7 +57,7 @@
 			// El formato de las validaciones es una cadena notnull|hasValue|dni|...
 			foreach ($validaciones as $valor => $validacion) {
 				if (is_string($validacion)) {
-					$pruebasValidaciones[$valor] = separarString(cadena: $validacion,pattern: "/(?=.*[a-z\s]+)\|/");
+					$pruebasValidaciones[$valor] = self::separarString(cadena: $validacion,pattern: "/(?=.*[a-z\s]+)\|/");
 				}
 			}
 			

@@ -8,6 +8,8 @@
      */
     class Session implements Singelton {
 
+        use GestorStrings;
+
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * La instancia creada de la sesión la cual será reutilizada varias veces para evitar instanciar mas de una clase e iniciar mas de una sesión.
@@ -205,17 +207,19 @@
         }
         
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * save
          * Método que setea todos los valores de los parámetros de sesión en el array assoc $_SESSION cierra la sesión y guarda los cambios realizados.
+         * @author Sxcram02 ms2d0v4@gmail.com
          * @return void
          */
-        public function save(): void{
+        public function save(): void {
             foreach($this -> parametrosSesion as $nombreParametro => $parametro){
-                $esObjeto =  existenCoincidencias("/([iaOs]{1}:[0-9]{1,3}:\"?.*\"?)+/",$parametro);
-
-                if(!$esObjeto){
-                    $parametro = filtrarContenido($parametro);
+                if(!is_array($parametro)){
+                    $esObjeto =  self::existenCoincidencias("/([iaOs]{1}:[0-9]{1,3}:\"?.*\"?)+/",$parametro);
+    
+                    if(!$esObjeto){
+                        $parametro = self::filtrarContenido($parametro);
+                    }
                 }
 
                 $_SESSION[$nombreParametro] = $parametro;
@@ -223,9 +227,9 @@
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * get
          * Método que obtiene todos los valores de los parámetros de sesión o solo el pasado por parametro
+         * @author Sxcram02 ms2d0v4@gmail.com
          * @param string $variable
          * @return mixed
          */
@@ -234,11 +238,15 @@
                 $valores = [];
                 $parametros = $this -> parametrosSesion;
                 foreach($parametros as $nombre => $valor){
-                    $esObjeto =  existenCoincidencias("/([iaOs]{1}:[0-9]{1,3}:\"?.*\"?)+/",$valor);
+                    $esObjeto =  self::existenCoincidencias("/([iaOs]{1}:[0-9]{1,3}:\"?.*\"?)+/",$valor);
                     
                     $valores[$nombre] = $esObjeto ? unserialize($valor) : $valor;
                 }
 
+                if(!isset($valores[$variable])){
+                    return null;
+                }
+                
                 return (!empty($variable)) ? $valores[$variable] : $valores;
             }
 

@@ -6,6 +6,7 @@
      * Clase que obtendra los parametros y valores asociados a una consulta los separará, determinara su tipo y los preparará en una cada para una consulta
      */
     class Consulta {
+        use GestorStrings;
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * Cadena con la consulta original
@@ -199,7 +200,7 @@
          */
         private function obtenerParametrosUpdate(string $query): void {
 
-        $regexUpdate = "/\b(\w+) = (\'?[\w\@\.\-_\s\/áéíóúñö:ü]+\'?)\b/i";
+        $regexUpdate = "/\b(\w*) = (\'?[\w\@\.\-_\s\/áéíóúñö:ü\$]+\'?)\b/i";
 
             if(str_contains($query,'WHERE')){
                 $posClausulaWhere = strpos($query,'WHERE');
@@ -235,10 +236,10 @@
                 $nombreParametro = $claves[$indice];
 
                 if(!in_array($nombreParametro,["passUsuario"])){
-                    $parametro = filtrarContenido($parametro);
+                    $parametro = self::filtrarContenido($parametro);
                 }
 
-                $nombreParametro = filtrarContenido($nombreParametro);
+                $nombreParametro = self::filtrarContenido($nombreParametro);
                 $nombreParametro = preg_replace("/\s?\w+\./", "", $nombreParametro);
                 
                 $parametrosPreparados[":$nombreParametro"] = [
@@ -262,15 +263,15 @@
             if(is_string($dato)){
                 $tipo = \PDO::PARAM_STR;
 
-                if(existenCoincidencias("/^[0-9]{1,5}$/",$dato)){
+                if(self::existenCoincidencias("/^[0-9]{1,5}$/",$dato)){
                     return \PDO::PARAM_INT;
                 }
                 
-                if(existenCoincidencias("/^(?!NULL|null)[\bfalse\b|\btrue\b]$/i",$dato)){
+                if(self::existenCoincidencias("/^(?!NULL|null)[\bfalse\b|\btrue\b]$/i",$dato)){
                     return \PDO::PARAM_BOOL;
                 }
 
-                if(existenCoincidencias("/^(?!NULL|null)[ñáéíóúÁÉÍÓÚ\w\@\.\s\%]+$/i",$dato)){
+                if(self::existenCoincidencias("/^(?!NULL|null)[ñáéíóúÁÉÍÓÚ\w\@\.\s\%]+$/i",$dato)){
                     return \PDO::PARAM_STR;
                 }
 
@@ -284,7 +285,7 @@
                 $tipo = \PDO::PARAM_BOOL;
             }
 
-            if(!isset($dato) || existenCoincidencias("/null/i",$dato)){
+            if(!isset($dato) || self::existenCoincidencias("/null/i",$dato)){
                 $tipo = \PDO::PARAM_NULL;
             }
 
@@ -307,7 +308,7 @@
                 foreach ($parametrosPreparados as $nombreParametro => $detalles) {
                     $parametro = $detalles['valor'];
 
-                    if(existenCoincidencias("/[\Wñáéíóúñöü]+/i",$parametro)){
+                    if(self::existenCoincidencias("/[\Wñáéíóúñöü]+/i",$parametro)){
                         $regexEspecial = preg_quote($parametro,'/');
                         $consulta = preg_replace("/$regexEspecial/", $nombreParametro, $consulta,1);
                     }else{

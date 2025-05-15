@@ -66,7 +66,7 @@
                 }
             }
 
-            if($_SERVER["REQUEST_METHOD"] == "GET" || existenCoincidencias("/put|delete|head|post/i",$requestCopy['_method'])){
+            if($_SERVER["REQUEST_METHOD"] == "GET" || self::existenCoincidencias("/put|delete|head|post/i",$requestCopy['_method'])){
                 foreach ($_GET as $clave => $valor) {
                     if(!in_array($clave,['clave-publica']) && !is_array($valor)){
                         $valor = self::estaCodificado($valor) ? self::decrypt($valor) : $valor;
@@ -150,7 +150,7 @@
          * @return mixed
          */
         public static function method(string $nombreMetodo):mixed {
-            if(!existenCoincidencias("/put|post|get|delete/i",$nombreMetodo)){
+            if(!self::existenCoincidencias("/put|post|get|delete/i",$nombreMetodo)){
                 return false;
             } 
             

@@ -7,6 +7,8 @@
      * Clase encargada de mostrar y crear logs de headers y apache
      */
     class Logs {
+
+        use GestorStrings;
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * Instancia privada del objeto Logs 
@@ -26,27 +28,27 @@
         private string $logFile;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Array con todos los logs obtenidos de apache
          * @private
          * @var array
          * @default []
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private array $logs = [];
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Array con todos los header recibidos 
          * @private
          * @var array
          * @default []
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private $headers = [];
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Total de request registradas en ejecución
          * @private
          * @var int
          * @default 0
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private $totalRequests = 0;
 
@@ -59,14 +61,6 @@
          */
         private $logPath = 'src/logs';
 
-        /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * úmero que almacena el número total de logs en el archivo access.log
-         * @private
-         * @var int
-         * @default 0
-         */
-        private $totalDeLogs = 0;
 
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
@@ -91,6 +85,7 @@
             }
             $this->logFile = $this->logPath . '/' . $filename;
             $this->getApacheLogs();
+
         }
         
         /**
@@ -132,80 +127,46 @@
          * Método encargado de obtener el contenido de los logs de apache separarlos, y formatear cada log en un array personalizado de log y setea los log con un array con lod datos del log
          * @return void
          */
-        private function getApacheLogs(): void  {
-            $estadisticasPersonalizadas = [];
+        private function getApacheLogs(bool $paginado = true): void  {
+            $logPersonalizados = [];
+            $logs = $this -> obtenerLogsArchivo('C:\xampp\apache\logs\access.log');
+            $logs = $this -> formatearTextoLogs($logs);
+            $totalLogs = count($logs);
+            
+            foreach($logs as $indice => $log){
+                $logs[$indice] = [
+                    'num' => $indice + 1,
+                    'ip_remota' => $log[0],
+                    'fecha' => $log[1],
+                    'metodo' => $log[2],
+                    'URI' => $log[3],
+                    'protocolo' => $log[4],
+                    'codigo' => $log[5],
+                    'pid' => $log[6],
+                    'URL' => $log[7],
+                    'agente' => $log[8]
+                ];
+            }
+            
+
+            $paginas = [];
             $pagina = [];
-
-            $bytes = filesize('C:\xampp\apache\logs\access.log');
-            $kiloBytes = $bytes / 1024;
-            $megaBytesArchivo = $kiloBytes / 1024;
-
-            $estadisticas = "";
-            if ($megaBytesArchivo > 5) {
-                $megaBytesAleer = 1024**2;
-                $megaBytesLeidos = 0;
-                $gestor = fopen('C:\xampp\apache\logs\access.log','rb');
-
-                while($megaBytesLeidos < $megaBytesArchivo){
-                    $estadisticas .= fread($gestor,$megaBytesAleer);
-                    $megaBytesLeidos += $megaBytesAleer;
-                }
-
-                fclose($gestor);
-            } else {
-                $estadisticas .= file_get_contents('C:\xampp\apache\logs\access.log');
-            }
-
-            $estadisticas = preg_replace('/\-\s\-/', '', $estadisticas);
-            $estadisticas = preg_replace('/(?!^)(?=\b[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\b)/', '??', $estadisticas);
-            $estadisticas = preg_split('/\?\?/',$estadisticas);
-
-            foreach($estadisticas as $indice => $log){
-                $log = preg_replace("/(.+)?\s+\[(.+)\]\s+\"(.+)\s+(.+)\s+(.+)\"\s+(.+)\s+(.+)\s+\"(.+)?\"\s+\"(.+)?\"/","$1=$2=$3=$4=$5=$6=$7=$8=$9",$log);
-                $estadisticas[$indice] = $log;
-            }
-        
-
-            $logsPersonalizadosPuestos = 0;
+            $logPuestoPorPagina = 0;
             $indice = 0;
             $limiteLogsPagina = 10;
-            $totalLogs = count($estadisticas);
-            $this -> totalDeLogs = $totalLogs;
-
-            do{
-                $log = $estadisticas[$indice];
-                $logArray = preg_split('/\=/',$log);
-
-                $logPersonalizado = [
-                    'num' => $indice + 1,
-                    'ip_remota' => $logArray[0],
-                    'fecha' => $logArray[1],
-                    'metodo' => $logArray[2],
-                    'URI' => $logArray[3],
-                    'protocolo' => $logArray[4],
-                    'codigo' => $logArray[5],
-                    'pid' => $logArray[6],
-                    'URL' => $logArray[7],
-                    'agente' => $logArray[8]
-                ];
-
-                if($totalLogs <= $limiteLogsPagina){
-                    $estadisticasPersonalizadas[] = $logPersonalizado;
-                    $logsPersonalizadosPuestos++;
-                    $indice++;
+            while($indice < $totalLogs){
+                if($logPuestoPorPagina == $limiteLogsPagina){
+                    $logPuestoPorPagina = 0;
+                    $paginas[] = $pagina;
+                    $pagina = [];
                 }else{
-                    if(count($pagina) >= $limiteLogsPagina){
-                        $estadisticasPersonalizadas[] = $pagina;
-                        $pagina = [];
-                    }else{
-                        $pagina[] = $logPersonalizado;
-                        $logsPersonalizadosPuestos++;
-                        $indice++;
-                    }
-                } 
-            }while($logsPersonalizadosPuestos != $totalLogs);
+                    $pagina[] = $logs[$indice];
+                    $logPuestoPorPagina++;
+                }
+                $indice++;
+            }
 
-            $this->logs = $estadisticasPersonalizadas;
+            $this->logs = array_reverse($paginas);
         }
 
         private function filtrarLog(string $filtro,string $valor){
@@ -223,13 +184,13 @@
                     $valorLog = $log[$filtro];
 
                     if(isset($valorLog) && !empty($valorLog) && 
-                    existenCoincidencias("/\b$valorLog\b/i",$valor)){
+                    self::existenCoincidencias("/\b$valorLog\b/i",$valor)){
                         $logsFiltrados[] = $log;
                     }
                 }
             }
 
-            return $logsFiltrados;
+            return array_reverse($logsFiltrados);
         }
 
 
@@ -287,9 +248,6 @@
         public function getTotalRequests(): int {
             return $this->totalRequests;
         }
-        public function countLogs():int {
-            return $this -> totalDeLogs;
-        }
         public function filtrarIp(string $valor){
             return $this -> filtrarLog('ip_remota',$valor);
         }
@@ -318,29 +276,91 @@
         }
         
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * @private
          * writeToFile
          * Método encargado de escribir en el archivo la cadena pasa por parametro al final del archivo
          * @param  mixed $line
          * @return void
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function writeToFile($line): void {
             file_put_contents($this->logFile, $line . PHP_EOL, FILE_APPEND);
         }
         
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * @private
          * rotateLogIfNeeded
          * Método encargado de crear un nuevo archivo de log en caso de que supere la cantidad maxima
          * @return void
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function rotateLogIfNeeded(): void{
             if (file_exists($this->logFile) && filesize($this->logFile) > $this->maxFileSize) {
                 $timestamp = date('Ymd_His');
                 rename($this->logFile, $this->logPath . "/request_$timestamp.log");
             }
+        }
+        
+        /**
+         * obtenerLogsArchivo
+         * Método que recibe una ruta de un archivo con logs y si su tamaño es mayor a 1.5 MB lo ira leyendo por partes y retornara un texto con los logs o un texto vacio.
+         * @param  string $archivo - ruta de archivo
+         * @return string
+         */
+        private function obtenerLogsArchivo(string $archivo): string {
+            if(!file_exists($archivo)){
+                return "";
+            }
+
+            $bytes = filesize($archivo);
+            $kiloBytes = $bytes / 1024;
+            $megaBytesArchivo = $kiloBytes / 1024;
+
+            $bytesMaximosArchivo = $megaBytesArchivo >= 1.5 ? $megaBytesArchivo - ($megaBytesArchivo / 2) : $megaBytesArchivo; 
+            $bytesMaximosArchivo *= 1024;
+            $bytesMaximosArchivo *= 1024;
+
+            $texto = "";
+            if ($megaBytesArchivo >= 1.5) {
+                $bytesLeidos = 0;
+                $bytesAleer = 4096;
+                $gestor = fopen($archivo,'r');
+
+                while($bytesLeidos < $bytesMaximosArchivo){
+                    $texto .= fread($gestor,$bytesAleer);
+                    $bytesLeidos += $bytesAleer;
+                }
+
+                fclose($gestor);
+            } else {
+                $texto .= file_get_contents($archivo);
+            }
+            return $texto;
+        }
+        
+        /**
+         * formatearTextoLogs
+         * Método que recibe el texto de los logs con el formato de apache y lo separará por log y formateara cada log con un formato propio retorna un array de logs formateados
+         * @param  string $logs
+         * @return array
+         */
+        private function formatearTextoLogs(string $logs): array|bool{
+            
+            $logs = preg_replace('/\-\s\-/', '', $logs);
+
+            $logs = preg_replace('/(?!^)(?=\b[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\b)/', '??', $logs);
+            $logs = preg_split('/\?\?/',$logs);
+
+            foreach($logs as $indice => $log){
+                $log = preg_replace("/(.+)?\s+\[(.+)\]\s+\"(.+)\s+(.+)\s+(.+)\"\s+(.+)\s+(.+)\s+\"(.+)?\"\s+\"(.+)?\"/","$1=$2=$3=$4=$5=$6=$7=$8=$9",$log);
+                $log = preg_split("/\=/",$log);
+                // Tiene la información mínima
+                if(count($log) >= 9){
+                    $logs[$indice] = $log;
+                }
+            }
+
+            return empty($logs) ? [] : $logs;
         }
     }
 ?>

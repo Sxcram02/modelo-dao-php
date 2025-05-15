@@ -7,6 +7,8 @@
      * Trait usada para la encriptación y desencriptación de datos con clave asimétrica.
      */
     trait Openssl {
+
+        use GestorStrings;
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * La clave pública para su uso al encriptar los datos.
@@ -234,7 +236,7 @@
         public static function estaCodificado(mixed $datos): bool {
             if(!is_array($datos) && isset($datos) && !empty($datos)){
 
-                return existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]+={1,2}$)/",$datos) ? true : false;
+                return self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]+={1,2}$)/",$datos) ? true : false;
             }
 
             if(empty($datos)){
@@ -243,7 +245,7 @@
 
             foreach($datos as $dato){
                 if(!is_array($datos) && isset($datos) && !empty($datos)){
-                    if(existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]*={1,2}$)/",$datos)){
+                    if(self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]*={1,2}$)/",$datos)){
                         return  true;
                     }
                 }
