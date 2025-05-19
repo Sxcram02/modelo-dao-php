@@ -70,6 +70,8 @@
          * @default 5
          */
         private float|int $maxFileSize = 5 * 1024 * 1024;
+
+        private int $logsTotales;
         
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
@@ -128,10 +130,10 @@
          * @return void
          */
         private function getApacheLogs(bool $paginado = true): void  {
-            $logPersonalizados = [];
             $logs = $this -> obtenerLogsArchivo('C:\xampp\apache\logs\access.log');
             $logs = $this -> formatearTextoLogs($logs);
             $totalLogs = count($logs);
+            $this -> logsTotales = $totalLogs;
             
             foreach($logs as $indice => $log){
                 $logs[$indice] = [
@@ -148,12 +150,12 @@
                 ];
             }
             
-
             $paginas = [];
             $pagina = [];
             $logPuestoPorPagina = 0;
             $indice = 0;
             $limiteLogsPagina = 10;
+
             while($indice < $totalLogs){
                 if($logPuestoPorPagina == $limiteLogsPagina){
                     $logPuestoPorPagina = 0;
@@ -237,6 +239,11 @@
          */
         public function getHeaders(): array {
             return $this->headers;
+        }
+
+
+        public function countLogs(): int {
+            return $this -> logsTotales;
         }
 
         /**
@@ -324,7 +331,7 @@
             if ($megaBytesArchivo >= 1.5) {
                 $bytesLeidos = 0;
                 $bytesAleer = 4096;
-                $gestor = fopen($archivo,'r');
+                $gestor = fopen($archivo,'ra');
 
                 while($bytesLeidos < $bytesMaximosArchivo){
                     $texto .= fread($gestor,$bytesAleer);
@@ -335,6 +342,7 @@
             } else {
                 $texto .= file_get_contents($archivo);
             }
+
             return $texto;
         }
         

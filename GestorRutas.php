@@ -6,8 +6,8 @@
      * Trait usado para la separación y comprobación de las rutas personalizadas
      */
     trait GestorRutas {
-
         use GestorStrings;
+
         /**
          * @author Sxcram02 ms2d0v4@gmail.com
          * @static

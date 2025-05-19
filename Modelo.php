@@ -295,8 +295,8 @@ use Src\App\Database;
             }
             
             if (is_string($columnas)){
-                $selecionaTodo = self::self::existenCoincidencias("#\*#",$columnas);
-                if(!$selecionaTodo && self::self::existenCoincidencias("/,:;-/", $columnas)) {
+                $selecionaTodo = self::existenCoincidencias("#\*#",$columnas);
+                if(!$selecionaTodo && self::existenCoincidencias("/,:;-/", $columnas)) {
                     $datos = self::separarString($columnas);
                 }
             }else{
@@ -414,7 +414,7 @@ use Src\App\Database;
             }
 
             // tabla1 tb1
-            if (self::self::existenCoincidencias("/\s[a-z]{3}/", $tablaUnida, $abreviaturas)) {
+            if (self::existenCoincidencias("/\s[a-z]{3}/", $tablaUnida, $abreviaturas)) {
                 $abreviacionTablaUnida = trim($abreviaturas[0]);
             } else {
                 $tablaUnida =  "$tablaUnida $abreviacionTablaUnida";

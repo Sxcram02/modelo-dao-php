@@ -16,7 +16,7 @@ use Src\App\Logs;
  * @use GestorRutas
  */
 class Route implements Singelton {
-    use GestorStrings;
+    use GestorRutas;
     
     /**
      * @author Sxcram02 ms2d0v4@gmail.com

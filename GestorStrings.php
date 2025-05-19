@@ -2,7 +2,6 @@
     namespace Src\App;
 
     trait GestorStrings {
-        use GestorRutas;
 
         /**
          * estaCifrada
