@@ -2,26 +2,27 @@
 	namespace Src\App;
 	use DateTime;
 	/**
-	 * @author Sxcram02 ms2d0v4@gmail.com
 	 * Files
 	 * La clase files se encargará de gestionar todos los archivos multimedia introducidos, gestionando sus rutas, tamaño y formato.
+	 * @final
+	 * @author Sxcram02 ms2d0v4@gmail.com
 	*/
-	class Files {
+	final class Files {
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * El tamaño maximo de los archivos multimedia en megabytes.
 		 * @static
 		 * @var int $megabytesMaximos
 		 * @default 45
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public static int $megabytesMaximos = 45;
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * Los tipos de archivos admitidos.
 		 * @static
 		 * @var array $tiposAdmitidos
 		 * @default ["image/jpeg","image/png","image/gif","image/jpg","video/mp4","application/pdf"]
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public static array $tiposAdmitidos = [
 			"image/jpeg",
@@ -33,33 +34,42 @@
 		];
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * El nombre del archivo.
-		 * @private
 		 * @var ?string $nombreArchivo
 		 * @default null
+		 * @private
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		private ?string $nombreArchivo = null;
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * La ubicacion del archivo.
-		 * @private
 		 * @var ?string $ubicacionArchivo
 		 * @default null
+		 * @private
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		private ?string $ubicacionArchivo = null;
 
+		/**
+		 * El tamaño del archivo.
+		 * @var ?string $tamanioArchivo
+		 * @default null
+		 * @private
+		 * @author Sxcram02 ms2d0v4@gmail.com
+		 */
+		private ?string $tamanioArchivo = null;
+
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @private
 		 * __construct
 		 * Método que recibe el nombre del archivo, su carpeta temporal y su tipo y lo mueve a la carpeta correspondiente.
 		 * @param  string $nombreArchivo
 		 * @param  string $carpetaTemporal
 		 * @param  string $tipo
 		 * @return void
+		 * @private
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		private function __construct(string $nombreArchivo,string $carpetaTemporal,string $tipo){
 
@@ -76,18 +86,19 @@
 			$rutaDestino = "public/$tipoArchivo/$nombreArchivo";
 			if(move_uploaded_file($carpetaTemporal,$rutaDestino)){
 				$this -> nombreArchivo = $nombreArchivo;
-				$this -> ubicacionArchivo = $rutaDestino;	
+				$this -> ubicacionArchivo = $rutaDestino;
+				$this -> tamanioArchivo = ((filesize($rutaDestino) / 1024) / 1024) / 1024;
 			}
 		}
 		
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @static
 		 * filtrarImagen
 		 * Método que recibe un array con los datos de una imagen y retorna un array con el resultado un objeto Files o un booleano y en caso de fallo un mensaje en base al error
 		 * @param  array $imagen
 		 * @return array
+		 * @static
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public static function filtrarImagen(array $imagen): array{
 			$resultado = [
@@ -160,13 +171,13 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @private
-		 * @static
 		 * esUnTipoValido
 		 * Método que termina a partir de uno o varios tipo introducidos, si existen estos en los tipos admitidos por el objeto
 		 * @param  string|array $tipos
 		 * @return bool
+		 * @private
+		 * @static
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		private static function esUnTipoValido(string|array $tipos): bool {
 			if(!is_array($tipos)){
@@ -183,15 +194,15 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @private
-		 * @static
 		 * subirArchivo
 		 * Método encargado de intentar con un try/catch instanciar el objeto Files y retornarlo a partir del nombre del archivo, su ubicacion y su tipo
 		 * @param  string $nombreArchivo
 		 * @param  string $carpetaTemporal
 		 * @param  string $tipo
 		 * @return bool
+		 * @static
+		 * @private
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		private static function subirArchivo(string $nombreArchivo,string $carpetaTemporal,string $tipo): bool|Files {
 			try {
@@ -203,23 +214,33 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * getUbicacionArchivo
 		 * Método encargado de obtener la nueva ubicación del archivo
 		 * @return string
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function getUbicacionArchivo(): string {
 			return $this -> ubicacionArchivo;
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * getNombreArchivo
 		 * Método encargado de retorna el nuevo nombre del archivo
 		 * @return string
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function getNombreArchivo(): string {
 			return $this -> nombreArchivo;
+		}
+
+		/**
+		 * getTamanioArchivo
+		 * Método encargado de retorna el tamaño en megabytes del archivo
+		 * @return string
+		 * @author Sxcram02 ms2d0v4@gmail.com
+		 */
+		public function getTamanioArchivo(): string {
+			return $this -> tamanioArchivo;
 		}
 	}
 ?>
