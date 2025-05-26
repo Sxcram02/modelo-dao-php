@@ -5,8 +5,9 @@
      * Clase que obtendra los parametros y valores asociados a una consulta los separará, determinara su tipo y los preparará en una cada para una consulta
      * @author Sxcram02 ms2d0v4@gmail.com
      * @use GestorStrings
+     * @final
      */
-    class Consulta {
+    final class Consulta {
         use GestorStrings;
         /**
          * Cadena con la consulta original

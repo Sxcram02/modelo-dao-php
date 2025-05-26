@@ -1,36 +1,41 @@
 <?php
 	namespace Src\App;
 	/**
-	 * @author Sxcram02 ms2d0v4@gmail.com
 	 * Filtro
 	 * Objeto usado para la validación de datos
+	 * @author Sxcram02 ms2d0v4@gmail.com
+	 * @use GestorStrings
+	 * @final
 	 */
-	class Filtro {	
+	final class Filtro {	
 		use GestorStrings;
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * Array con los errores encontrados en la svalidaciones
 		 * @var array
+		 * @default []
+		 * @author Sxcram02 ms2d0v4@gmail.com
+		 * @private
+		 * @static
 		 */
 		private static array $errores = [];
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @private
 		 * __construct
 		 * Método contructor del objeto
 		 * @return void
+		 * @author Sxcram02 ms2d0v4@gmail.com
+		 * @private
 		 */
 		private function __construct(){}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @private
 		 * validarRegex
 		 * Método para validar un valor con una regex y longitud adecuada, retorna true o false
 		 * @param string $regex 
 		 * @param mixed $valor
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
+		 * @private
 		 */
 		private function validarRegex(string $regex,mixed $valor): bool {
 			$esValido = true;
@@ -41,14 +46,12 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @static
 		 * validate
 		 * Método que recibe un array assoc que tiene como clave el valor que debe ser validado y como valor las validaciones a usar.
 		 * @param  array $validaciones 
 		 * @return bool
-		 * @throws \Exception En caso de no recibir un array assoc.
-		 * @throws \Exception En caso de no existir una validación en la clase.
+		 * @static
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public static function validate(array $validaciones): bool {
 			$filtro = new Filtro();
@@ -95,14 +98,15 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * maxlenght
 		 * Método que determina si la longitud de la cadena es correcta y/o adecuada, recibiendo dos parámetros el primero la cadena y el segundo la longitud máxima que debe tener.
 		 * @param ?string $valor - La cadena que va a ser analizada.
 		 * @param int|string $longitud - La longitud máxima de la cadena.
+		 * @default 255
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
-		public function maxlenght(?string $valor, int|string $longitud = 255): bool{
+		public function maxlenght(?string $valor, int|string $longitud = 255): bool {
 			$esValido = strlen($valor) <= $longitud;
 			$errores = self::$errores;
 
@@ -127,11 +131,11 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * nombre
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un nombre propio de una persona, retorna false en caso de superar los 90 caractéres o en caso de no cumplir con la regex.
 		 * @param  string $nombre - cadena que será analizada por la expresión rgular.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function nombrepropio(?string $nombre): bool {		
 			$errores = self::$errores;
@@ -156,11 +160,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * number
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un número entero, retorna false en caso de superar los 90 caractéres o en caso de no cumplir con la regex.
 		 * @param string|int|null $numero - cadena que será analizada por la expresión rgular.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function number(string|int|null $numero): bool {		
 			$errores = self::$errores;
@@ -186,11 +190,11 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * apellidos
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un apellido o apellidos de una persona, retorna false en caso de superar los 100 caractéres o en caso de no cumplir con la regex.
 		 * @param string $apellido - cadena con uno o dos apellidos.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function apellidos(string $apellido): bool {
 			$regexApellido = "/[a-z\s]+/i";
@@ -216,11 +220,11 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * email
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un correo electrónico de una persona, retorna false en caso de superar los 150 caractéres o en caso de no cumplir con la regex.
 		 * @param string $email - cadena que deberá corresponder con un correo electrónico.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function email(string $email):bool {
 			$regexEmail = "/^[0-9a-z-_\.]+\@[a-z]{5,}\.[a-z]{2,3}$/";
@@ -246,11 +250,11 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * telefono
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un número de teléfono de una persona o del trabajo, retorna false en caso de superar los 13 caractéres o en caso de no cumplir con la regex.
 		 * @param string $telefono - número de teléfono con o sin prefijo.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function telefono(string $telefono): bool {
 			$regexTelefono = "/^(\+[0-9]{1,3})?[0-9]{9}$/";
@@ -276,11 +280,11 @@
 		}
 		
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * text
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un texto, retorna false en caso de superar los 300 caractéres o en caso de no cumplir con la regex.
 		 * @param string $texto - cualquier cadena de texto que será comprobada.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function text(string $texto): bool {
 			$errores = self::$errores;
@@ -304,11 +308,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * notnull
 		 * Método que determina si un valor es nulo o esta vacío retorna false en caso de ser cierto o true si no es nulo ni esta vacío el dato pasado por parámetro.
 		 * @param mixed $valor - cualquier cadena, número o booleano que será comprobado.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function notnull(mixed $valor): bool {
 			$errores = self::$errores;
@@ -328,11 +332,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * hasValue
 		 * Método encargado de comprobar que un valor no este vacío
 		 * @param mixed $valor - cualquier cadena, número flotante o entero o un booleano que será comprobado.
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function hasValue(mixed $valor): bool {
 			$errores = self::$errores;
@@ -352,11 +356,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * dni
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un documento nacional de identificación, retorna false en caso de superar los 9 caractéres o en caso de no cumplir con la regex.
 		 * @param string $dni - la cadena de texto con formato 00000000X
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function dni(string $dni): bool {
 			$regexDni = "/^[0-9]{8}[A-Z]{1}$/";
@@ -383,11 +387,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * year
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un número de año, retorna false en caso de superar los 4 caractéres o en caso de no cumplir con la regex.
 		 * @param string $year - la cadena de texto con un año entre 19XX - 20XX
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function year(string $year): bool {
 			$regexYear = "/^19[0-9]{2}|20[0-3][0-9]$/";
@@ -413,11 +417,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * fecha
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a una fecha, retorna false en caso de superar los 10 caractéres o en caso de no cumplir con la regex.
 		 * @param string $year - la cadena de texto con un año entre 19XX - 20XX
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function fecha(string $fecha): bool {
 			$regexFecha = "/^19[0-9]{2}|20[0-3][0-9]\-[0][1-9]|[1][0-2]\-[0-2][0-9]|[3][0-1]$/";
@@ -444,11 +448,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * password
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un número de año, retorna false en caso de superar los 4 caractéres o en caso de no cumplir con la regex.
 		 * @param string $year - la cadena de texto con un año entre 19XX - 20XX
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function password(string $pass): bool {
 			$regexPass = "/(?=[áéíúóña-z]+[0-9]+\W+).{8,}/i";
@@ -472,11 +476,11 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
 		 * url
 		 * Método que recibe una cadena que debe cumplir dicha expresión regular asociada a un número de año, retorna false en caso de superar los 4 caractéres o en caso de no cumplir con la regex.
 		 * @param string $year - la cadena de texto con un año entre 19XX - 20XX
 		 * @return bool
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function url(string $url): bool {
 			$regexUrl = "#^https:\/\/#i";
@@ -500,13 +504,13 @@
 		}
 
 		/**
-		 * @author Sxcram02 ms2d0v4@gmail.com
-		 * @static
 		 * getErrors
 		 * Método que por defecto retorna todos los errores de las validaciones realizadas recientemente o un error en concreto
 		 * @param  ?int $indiceError
 		 * @default null
 		 * @return array
+		 * @static
+		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public static function getErrors(?int $indiceError = null):array {
 			$errores = self::$errores;

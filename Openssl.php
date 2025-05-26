@@ -89,7 +89,7 @@
          * @param  string|array $datos
          * @return mixed
          */
-        private static function encript(string|array $datos): mixed {
+        private static function encript(string|array $datos,string $base = "base64"): mixed {
 
             if(!isset(self::$clavePublica)){
                 throw new \Exception('No existe clave pública disponible');
@@ -97,14 +97,14 @@
 
             if(!is_array($datos)){
                 openssl_public_encrypt($datos,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_PADDING);
-                $datoCodificado = self::encode($datoEncriptado);
+                $datoCodificado = self::encode($datoEncriptado,$base);
                 return $datoCodificado;
             }
 
 
             foreach($datos as $indice => $dato){
                 openssl_public_encrypt($dato,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_PADDING);
-                $datoCodificado = self::encode($datoEncriptado);
+                $datoCodificado = self::encode($datoEncriptado,$base);
                 $datos[$indice] = $datoCodificado;
             }
 
@@ -121,21 +121,20 @@
          * @param string|array $datos
          * @return mixed
          */
-        private static function decript(string|array $datos): mixed {
-
+        private static function decript(string|array $datos,string $base = "base64"): mixed {
             if(!isset(self::$clavePrivada)){
                 throw new \Exception('No existe clave privada disponible');
             }
 
             if(!is_array($datos)){
-                $datoDescodificado = self::decode($datos);
+                $datoDescodificado = self::decode($datos,$base);
                 $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
 
                 return $estaDesencriptado ? $datoDesencriptado : '';
             }
 
             foreach($datos as $indice => $dato){
-                $datoDescodificado = self::decode($dato);
+                $datoDescodificado = self::decode($dato,$base);
                 $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
                 $datos[$indice] = $estaDesencriptado ? $datoDesencriptado : '';
             }
@@ -155,27 +154,35 @@
          * @return mixed
          */
         private static function encode(mixed $datos,string $base = "base64"): mixed {
-            if(!in_array($base,['base64'])){
+            if(!in_array($base,['base64','url'])){
                 throw new \Exception("No esta permitido $base como formato de codificación");
             }
 
-            if(!is_array($datos) && isset($datos) && !empty($datos)){
-                return match($base){
+            if(!isset($datos) || empty($datos)){
+                return false;
+            }
+
+            if(!is_array($datos)){
+                $datos =  match($base){
                     "hexa" => hex2bin($datos),
                     default => base64_encode($datos)
                 };
-            }
 
-            if(empty($datos)){
-                return null;
-            }
-
-            foreach($datos as $indice => $dato){
-                if(!is_array($dato) && isset($dato) && !empty($dato)){
-                    $datos[$indice] = match($base){
-                        "hexa" => hex2bin($dato),
-                        default => base64_encode($dato)
-                    };
+                if($base == "url"){
+                    $datos = rawurlencode($datos);
+                }
+            }else{
+                foreach($datos as $indice => $dato){
+                    if(!is_array($dato) && isset($dato) && !empty($dato)){
+                        $datos[$indice] = match($base){
+                            "hexa" => hex2bin($dato),
+                            default => base64_encode($dato)
+                        };
+    
+                        if($base == "url"){
+                            $datos[$indice] = rawurlencode($dato);
+                        }
+                    }
                 }
             }
 
@@ -195,29 +202,35 @@
          * @return mixed
          */
         private static function decode(mixed $datos,string $base = "base64"): mixed {
-            if(!in_array($base,['base64'])){
+            if(!in_array($base,['base64','url'])){
                 throw new \Exception("No esta permitido $base como formato de codificación");
             }
 
-            if(!is_array($datos) && isset($datos) && !empty($datos)){
+            if(!isset($datos) || empty($datos)){
+                return false;
+            }
+
+            if(!is_array($datos)){
+                if($base == "url"){
+                    $datos = rawurldecode($datos);
+                }
+
                 return match($base){
                     "hexa" => bin2hex($datos),
-                    "base64" => base64_decode($datos),
-                    default => $datos
+                    default => base64_decode($datos)
                 };
-            }
-
-            if(empty($datos)){
-                return $datos;
-            }
-
-            foreach($datos as $indice => $dato){
-                if(!is_array($dato) && isset($dato) && !empty($dato)){
-                    $datos[$indice] = match($base){
-                        "hexa" => bin2hex($dato),
-                        "base64" => base64_decode($dato),
-                        default => $dato
-                    };
+            }else{
+                foreach($datos as $indice => $dato){
+                    if(!is_array($dato) && isset($dato) && !empty($dato)){
+                        if($base == "url"){
+                            $datos = rawurldecode($dato);
+                        }
+    
+                        $datos[$indice] = match($base){
+                            "hexa" => bin2hex($dato),
+                            default => base64_decode($dato)
+                        };
+                    }
                 }
             }
 
@@ -235,6 +248,9 @@
          */
         public static function estaCodificado(mixed $datos): bool {
             if(!is_array($datos) && isset($datos) && !empty($datos)){
+                if(strlen($datos) >= 350){
+                    return true;
+                }
 
                 return self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]+={1,2}$)/",$datos) ? true : false;
             }
@@ -244,8 +260,12 @@
             }
 
             foreach($datos as $dato){
-                if(!is_array($datos) && isset($datos) && !empty($datos)){
-                    if(self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]*={1,2}$)/",$datos)){
+                if(!is_array($dato) && isset($dato) && !empty($dato)){
+                    if(strlen($dato) >= 350){
+                        return true;
+                    }
+
+                    if(self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]*={1,2}$)/",$dato)){
                         return  true;
                     }
                 }

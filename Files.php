@@ -1,6 +1,7 @@
 <?php
 	namespace Src\App;
 	use DateTime;
+	use Exception;
 	/**
 	 * Files
 	 * La clase files se encargará de gestionar todos los archivos multimedia introducidos, gestionando sus rutas, tamaño y formato.
@@ -75,19 +76,25 @@
 
 			$tipoArchivo = match($tipo){
 				"pdf" => "pdf",
-				"jpg" => "img",
-				"png" => "img",
-				"jpeg" => "img",
+				"jpeg","png","jpg" => "img",
 				"gif" => "videos",
 				"mp4" => "videos"
 
 			};
 			
-			$rutaDestino = "public/$tipoArchivo/$nombreArchivo";
-			if(move_uploaded_file($carpetaTemporal,$rutaDestino)){
+			$rutaDestino = "public\\$tipoArchivo\\$nombreArchivo";
+
+			$seMovio = move_uploaded_file($carpetaTemporal,$rutaDestino);
+			if(!$seMovio){
+				$seMovio = copy($carpetaTemporal,$rutaDestino);
+			}
+
+			if($seMovio){
 				$this -> nombreArchivo = $nombreArchivo;
 				$this -> ubicacionArchivo = $rutaDestino;
 				$this -> tamanioArchivo = ((filesize($rutaDestino) / 1024) / 1024) / 1024;
+			}else{
+				throw new Exception('La imagen no se pudo subir a la carpeta public/img');
 			}
 		}
 		
@@ -208,7 +215,7 @@
 			try {
 				$file = new Files($nombreArchivo,$carpetaTemporal,$tipo);
 				return $file;
-			} catch (\Error|\ErrorException|\Exception $error) {
+			} catch (\Error|\ErrorException|Exception $error) {
 				return false;
 			}
 		}

@@ -53,9 +53,10 @@
             if(in_array($_SERVER["REQUEST_METHOD"],["POST",'PUT'])){
                 foreach ($_POST as $clave => $valor) {
                     if(!in_array($clave,['clave-publica']) && !is_array($valor)){
-                        $requestCopy[$clave] = self::estaCodificado($valor) ? self::decrypt($valor) : $valor;
+                        $valor = self::estaCodificado($valor) ? self::decrypt($valor,'url') : $valor;
                     }
-        
+                    
+                    $requestCopy[$clave] =  $valor;
                     $_POST[$clave] = null;
                 }
         
@@ -69,10 +70,10 @@
             if($_SERVER["REQUEST_METHOD"] == "GET" || self::existenCoincidencias("/put|delete|head|post/i",$requestCopy['_method'])){
                 foreach ($_GET as $clave => $valor) {
                     if(!in_array($clave,['clave-publica']) && !is_array($valor)){
-                        $valor = self::estaCodificado($valor) ? self::decrypt($valor) : $valor;
-                        $requestCopy[$clave] =  $valor;
+                        $valor = self::estaCodificado($valor) ? self::decrypt($valor,'url') : $valor;
                     }
 
+                    $requestCopy[$clave] =  $valor;
                     $_GET[$clave] = null;
                 }
             }
@@ -163,15 +164,14 @@
          * encrypt
          * Método encargado de encriptar y codificar los datos pasados por paramteros
          * @param  string|array $datos
-         * @return void
+         * @return mixed
          */
-        public static function encrypt(string|array $datos) {
+        public static function encrypt(string|array $datos,string $base = "base64") {
             if(!isset(self::$clavePublica)){
                 self::getPrivateKey();
             }
-            return $datos;
 
-            $datos = self::encript($datos);
+            return self::encript($datos,$base);
         }
 
         /**
@@ -180,15 +180,14 @@
          * decrypt
          * Método encargado de descodificar y desencriptar los datos pasados por paramteros
          * @param  mixed $datos
-         * @return void
+         * @return mixed 
          */
-        public static function decrypt(mixed $datos): mixed{
+        public static function decrypt(mixed $datos,string $base = "base64"): mixed {
             if(!isset(self::$clavePublica)){
                 self::getPrivateKey();
             }
 
-            return $datos;
-            $datos = self::decript($datos);
+            return self::decript($datos,$base);
         }
     }
 ?>

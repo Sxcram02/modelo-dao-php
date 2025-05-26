@@ -13,7 +13,6 @@
     use PHPUnit\Framework\TestCase;
     use PHPUnit\Framework\Attributes\Test;
     use PHPUnit\Framework\Attributes\TestDox;
-
     
     final class DatabaseTest extends TestCase {
 
