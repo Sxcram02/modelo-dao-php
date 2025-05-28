@@ -86,8 +86,12 @@
                 $sonLaMismaRuta = false;
             } else {
                 foreach ($partesDeRutaEnv as $indice => $parte) {
-                    if ($esEstricto && $parte != $partesDeRutaReq[$indice]) {
-                        $sonLaMismaRuta = false;
+                    if ($esEstricto) {
+                        $indice = ($indice >= count($partesDeRutaReq)) ? $indice - 1 : $indice;
+                        
+                        if($parte != $partesDeRutaReq[$indice]){
+                            $sonLaMismaRuta = false;
+                        }
                     } else {
                         if (!self::tieneParametros($parte) && $parte != $partesDeRutaReq[$indice]) {
                             $sonLaMismaRuta = false;

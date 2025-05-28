@@ -164,6 +164,10 @@ use Src\App\Database;
 
                 $object -> $clave = $valor;
             }
+            
+            $object -> abreviacionTabla = null;
+            $object -> columnas = null;
+            $object -> tabla = null;
 
             return $object;
         }

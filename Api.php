@@ -55,9 +55,9 @@
             
             
             $resultados = match ($accion) {
-                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni, $pagina),
-                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni),
-                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni),
+                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni, (int) $pagina),
+                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni,(int) $pagina),
+                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni,(int) $pagina),
                 "dni" => AspiranteController::buscarPorDni($request->_user),
                 "email" => UsuarioController::buscarPorEmail($request->_user),
                 "actividad" => UsuarioController::getActividad($request),
