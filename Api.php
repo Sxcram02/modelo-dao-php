@@ -55,9 +55,9 @@
             
             
             $resultados = match ($accion) {
-                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni, (int) $pagina),
-                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni,(int) $pagina),
-                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni,(int) $pagina),
+                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni),
+                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni),
+                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni),
                 "dni" => AspiranteController::buscarPorDni($request->_user),
                 "email" => UsuarioController::buscarPorEmail($request->_user),
                 "actividad" => UsuarioController::getActividad($request),
@@ -65,7 +65,7 @@
             };
 
             if (is_object($resultados) && $resultados->isColeccion()) {
-                $resultados = $resultados->array();
+                $resultados = $resultados->paginate($pagina) -> array();
             }
             
             (!$resultados) ? Route::cabeceraRespuesta(404,[]) : Route::cabeceraRespuesta(200,$resultados);

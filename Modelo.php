@@ -120,9 +120,12 @@ use Src\App\Database;
                 }
                 
                 foreach ($registro as $atributo => $propiedad) {
-                    if($atributo)
                     $modelo -> $atributo = $propiedad;
                 }
+
+                unset($modelo -> tabla);
+                unset($modelo -> abreviacionTabla);
+                unset($modelo -> columnas);
             }
             
             return $modelo;
@@ -243,7 +246,7 @@ use Src\App\Database;
 
             $consulta = "DELETE FROM $tabla";
             $idTabla = self::obtenerIdTabla();
-            $numeroIds = count($idTabla);
+            $numeroIds = is_array($idTabla) ? count($idTabla) : 1;
             
             if(is_array($idTabla) && $numeroIds == 1){
                 $idTabla = $idTabla[0];
@@ -260,6 +263,7 @@ use Src\App\Database;
 
                 $primeraClave = true;
                 if(esArrayAssociativo($id)){
+                    $idTabla = array_keys($id);
                     $id = array_values($id);
                 }
 
@@ -730,6 +734,40 @@ use Src\App\Database;
                 $consulta .= " ORDER BY $columna $orden";
             }
             
+            $this -> consulta = $consulta;
+            return $this;
+        }
+
+        public function paginate($pagina = 1,$elementosPorPagina = 4){
+            $consulta = $this -> consulta;
+            $limiteInicial = 1;
+            $limiteFinal = 0;
+            $tabla = new static ();
+            $tabla = $tabla -> tabla;
+
+            $total = static::count();
+            (int) $paginas = round($total / $elementosPorPagina);
+            $paginas = $paginas <= 0 ? 1 : $paginas;
+
+            if(empty($consulta)){
+                $consulta = "SELECT * FROM $tabla";
+            }else{
+                if(str_contains($consulta,'LIMIT')){
+                    $indice = strpos($consulta,'LIMIT');
+                    $consulta = substr($consulta,0,$indice);
+                }
+            }
+            
+            if($pagina <= $paginas){
+                for($iteracion = 0; $iteracion < $pagina; $iteracion++){
+                    if($iteracion != 0){
+                        $limiteInicial += $elementosPorPagina - 1;
+                    }
+                    $limiteFinal += $elementosPorPagina;
+                }
+            }
+            
+            $consulta .= " LIMIT $limiteInicial,$limiteFinal";
             $this -> consulta = $consulta;
             return $this;
         }

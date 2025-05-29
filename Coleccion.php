@@ -146,7 +146,7 @@
             }while($paginasHechas != $numPaginas);
 
             $indice = $numPagina <= 0 ? $numPagina + 1 : $numPagina - 1;
-            $this -> modelos = ($indice >= count($paginas) - 1) ? []
+            $this -> modelos = ($indice > count($paginas) - 1) ? []
             : $paginas[$indice];
             return $this;
         }
