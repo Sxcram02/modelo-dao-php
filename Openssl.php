@@ -127,6 +127,8 @@
             }
 
             if(!is_array($datos)){
+                $datos = preg_replace("/\@+/",'+',$datos);
+                $datos = preg_replace("/!+/",'/',$datos);
                 $datoDescodificado = self::decode($datos,$base);
                 $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
 
@@ -163,25 +165,31 @@
             }
 
             if(!is_array($datos)){
-                $datos =  match($base){
+                $datos =  preg_replace("#\/#","!",match($base){
                     "hexa" => hex2bin($datos),
                     default => base64_encode($datos)
-                };
+                });
+
+                $datos = preg_replace('/\++/','@',$datos);
 
                 if($base == "url"){
                     $datos = rawurlencode($datos);
                 }
-            }else{
-                foreach($datos as $indice => $dato){
-                    if(!is_array($dato) && isset($dato) && !empty($dato)){
-                        $datos[$indice] = match($base){
-                            "hexa" => hex2bin($dato),
-                            default => base64_encode($dato)
-                        };
-    
-                        if($base == "url"){
-                            $datos[$indice] = rawurlencode($dato);
-                        }
+
+                return $datos;
+            }
+
+            foreach($datos as $indice => $dato){
+                if(!is_array($dato) && isset($dato) && !empty($dato)){
+                    $dato = preg_replace("#\/#","!",match($base){
+                        "hexa" => hex2bin($dato),
+                        default => base64_encode($dato)
+                    });
+
+                    $dato = preg_replace('/\++/','@',$dato);
+
+                    if($base == "url"){
+                        $datos[$indice] = rawurlencode($dato);
                     }
                 }
             }
@@ -219,18 +227,19 @@
                     "hexa" => bin2hex($datos),
                     default => base64_decode($datos)
                 };
-            }else{
-                foreach($datos as $indice => $dato){
-                    if(!is_array($dato) && isset($dato) && !empty($dato)){
-                        if($base == "url"){
-                            $datos = rawurldecode($dato);
-                        }
-    
-                        $datos[$indice] = match($base){
-                            "hexa" => bin2hex($dato),
-                            default => base64_decode($dato)
-                        };
+            }
+
+            foreach($datos as $indice => $dato){
+                if(!is_array($dato) && isset($dato) && !empty($dato)){
+                    if($base == "url"){
+                        $datos = rawurldecode($dato);
                     }
+
+                    $datos[$indice] = match($base){
+                        "hexa" => bin2hex($dato),
+                        default => base64_decode($dato)
+                    };
+
                 }
             }
 

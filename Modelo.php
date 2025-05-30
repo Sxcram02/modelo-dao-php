@@ -741,7 +741,7 @@ use Src\App\Database;
         public function paginate($pagina = 1,$elementosPorPagina = 4){
             $consulta = $this -> consulta;
             $limiteInicial = 1;
-            $limiteFinal = 0;
+            $limiteFinal = $elementosPorPagina;
             $tabla = new static ();
             $tabla = $tabla -> tabla;
 

@@ -70,7 +70,7 @@
             if($_SERVER["REQUEST_METHOD"] == "GET" || self::existenCoincidencias("/put|delete|head|post/i",$requestCopy['_method'])){
                 foreach ($_GET as $clave => $valor) {
                     if(!in_array($clave,['clave-publica']) && !is_array($valor)){
-                        $valor = self::estaCodificado($valor) ? self::decrypt($valor,'url') : $valor;
+                        $valor = self::estaCodificado($valor) ? self::decrypt($valor,'url') : urldecode($valor);
                     }
 
                     $requestCopy[$clave] =  $valor;

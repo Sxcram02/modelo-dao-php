@@ -87,7 +87,7 @@
             }
 
             
-            if(self::existenCoincidencias("/\W+/",$elemento)){
+            if(self::existenCoincidencias("/(?![\wñáíóúüöÁÍÉÚÓÖÜ\_]+)/",$elemento)){
                 $elemento = htmlspecialchars($elemento);
             }
 

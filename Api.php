@@ -5,7 +5,8 @@
     use Src\Controllers\ExperienciaController;
     use Src\Controllers\FormacionController;
     use Src\Controllers\IdiomaController;
-    use Src\Controllers\UsuarioController;
+use Src\Controllers\PublicacionController;
+use Src\Controllers\UsuarioController;
 
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -51,16 +52,20 @@
             $pagina = empty($request->__get('_pagina')) ? 1 : (int) $request->__get('_pagina');
 
             $usuario = $request->__get('_user');
-            $aspirante = AspiranteController::obtenerAspirante($usuario);
+            if($accion != 'filtrar'){
+                $aspirante = AspiranteController::obtenerAspirante($usuario);
+            }
             
             
             $resultados = match ($accion) {
-                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni),
-                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni),
-                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni),
+                "publicaciones" => PublicacionController::obtenerPublicaciones($usuario, $pagina),
+                "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni,$pagina),
+                "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni,$pagina),
+                "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni,$pagina),
                 "dni" => AspiranteController::buscarPorDni($request->_user),
                 "email" => UsuarioController::buscarPorEmail($request->_user),
                 "actividad" => UsuarioController::getActividad($request),
+                "filtrar" => UsuarioController::locationFilter($request -> _pais,'pais'),
                 default => []
             };
 

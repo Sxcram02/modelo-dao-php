@@ -143,7 +143,7 @@
             }
 
             if(str_contains($query,'LIMIT')){
-                $query = preg_replace("/\bLIMIT\b\s[0-9]*/","",$query);
+                $query = preg_replace("/\bLIMIT\b\s[0-9]*(\,[0-9]+)?/","",$query);
             }
 
             $query = substr($query,$posClausulaWhere,strlen($query));
@@ -163,7 +163,7 @@
             $regexParametros = "/(?<=[=<>!]\s|\s\bLIKE\b\s)\'?[ñáéíóúÁÉÍÓÚ\w\@\.\s\%-]+\'?(?=\s*\bAND\b|\bOR\b|$)/";
             // version 2
             // @todo Problemas cuando se realizan dos operadores LIKE seguidos
-            $regexParametros = "/(?<=[=<>!]\s|\s\bLIKE\b\s)\'?([%ñáéíóúÁÉÍÓÚ\w\@\.\s\%-]+)\'?(?=\s*\bAND\b|\s*\bOR\b|\s*$)/";
+            $regexParametros = "/(?<=[=<>!]\s|\s\bLIKE\b\s)\'?([%ñáéíóúÁÉÍÓÚ\w\@\.\s\%-]+)\'?(?=\s*\bAND\b|\s*\bOR\b|\s*\bLIMIT\b\s*$)/";
             
             //preg_match_all($regexParametros,$query,$parametros);
             preg_match_all($regexColumnas, $query, $claves);
@@ -233,10 +233,18 @@
             $parametros = $this -> parametros;
             $claves = $this -> claves;
             if(str_contains($this->consulta,'LIMIT')){
-                preg_match("/\bLIMIT\b\s([0-9]+)/",$this->consulta,$coincidencias);
+                preg_match("/\bLIMIT\b\s([0-9]+)\,([0-9]+)?/",$this->consulta,$coincidencias);
                 
-                $claves[] = 'limite';
-                $parametros[] = $coincidencias[1];
+                $limiteInicial = $coincidencias[1];
+                $limiteFinal = $coincidencias[2];
+
+                $claves[] = 'limiteInicial';
+                $parametros[] = $limiteInicial;
+
+                if(!empty($limiteFinal)){
+                    $claves[] = 'limiteFinal';
+                    $parametros[] = $limiteFinal;
+                }
             }
 
             $parametrosPreparados = [];
