@@ -127,8 +127,6 @@
             }
 
             if(!is_array($datos)){
-                $datos = preg_replace("/\@+/",'+',$datos);
-                $datos = preg_replace("/!+/",'/',$datos);
                 $datoDescodificado = self::decode($datos,$base);
                 $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
 
@@ -165,12 +163,13 @@
             }
 
             if(!is_array($datos)){
-                $datos =  preg_replace("#\/#","!",match($base){
+                $datos =  match($base){
                     "hexa" => hex2bin($datos),
                     default => base64_encode($datos)
-                });
+                };
 
-                $datos = preg_replace('/\++/','@',$datos);
+                $datos = preg_replace("#\/+#","@",$datos);
+                $datos = preg_replace('/\++/','*',$datos);
 
                 if($base == "url"){
                     $datos = rawurlencode($datos);
@@ -181,12 +180,13 @@
 
             foreach($datos as $indice => $dato){
                 if(!is_array($dato) && isset($dato) && !empty($dato)){
-                    $dato = preg_replace("#\/#","!",match($base){
+                    $dato =match($base){
                         "hexa" => hex2bin($dato),
                         default => base64_encode($dato)
-                    });
+                    };
 
-                    $dato = preg_replace('/\++/','@',$dato);
+                    $dato = preg_replace("#\/+#","@",$dato);
+                    $dato = preg_replace('/\++/','*',$dato);
 
                     if($base == "url"){
                         $datos[$indice] = rawurlencode($dato);
@@ -209,43 +209,50 @@
          * @default base64
          * @return mixed
          */
-        private static function decode(mixed $datos,string $base = "base64"): mixed {
-            if(!in_array($base,['base64','url'])){
-                throw new \Exception("No esta permitido $base como formato de codificación");
+    private static function decode(mixed $datos, string $base = "base64"): mixed
+    {
+        if (!in_array($base, ['base64', 'url'])) {
+            throw new \Exception("No esta permitido $base como formato de codificación");
+        }
+
+        if (!isset($datos) || empty($datos)) {
+            return false;
+        }
+
+        if (!is_array($datos)) {
+            if ($base == "url") {
+                $datos = rawurldecode($datos);
             }
+            
+            $datos = preg_replace("/\@+/", '/', $datos);
+            $datos = preg_replace("/\*+/", '+', $datos);
 
-            if(!isset($datos) || empty($datos)){
-                return false;
-            }
-
-            if(!is_array($datos)){
-                if($base == "url"){
-                    $datos = rawurldecode($datos);
-                }
-
-                return match($base){
-                    "hexa" => bin2hex($datos),
-                    default => base64_decode($datos)
-                };
-            }
-
-            foreach($datos as $indice => $dato){
-                if(!is_array($dato) && isset($dato) && !empty($dato)){
-                    if($base == "url"){
-                        $datos = rawurldecode($dato);
-                    }
-
-                    $datos[$indice] = match($base){
-                        "hexa" => bin2hex($dato),
-                        default => base64_decode($dato)
-                    };
-
-                }
-            }
+            $datos = match ($base) {
+                "hexa" => bin2hex($datos),
+                default => base64_decode($datos)
+            };
 
             return $datos;
-
         }
+
+        foreach ($datos as $indice => $dato) {
+            if (!is_array($dato) && isset($dato) && !empty($dato)) {
+                if ($base == "url") {
+                    $dato = rawurldecode($dato);
+                }
+                
+                $dato = preg_replace("/\@+/", '/', $dato);
+                $dato = preg_replace("/\*+/", '+', $dato);
+
+                $datos[$indice] = match ($base) {
+                    "hexa" => bin2hex($dato),
+                    default => base64_decode($dato)
+                };
+            }
+        }
+
+        return $datos;
+    }
         
         /**
          * @author Sxcram02 ms2d0v4@gmail.com

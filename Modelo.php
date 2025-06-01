@@ -740,7 +740,7 @@ use Src\App\Database;
 
         public function paginate($pagina = 1,$elementosPorPagina = 4){
             $consulta = $this -> consulta;
-            $limiteInicial = 1;
+            $limiteInicial = 0;
             $limiteFinal = $elementosPorPagina;
             $tabla = new static ();
             $tabla = $tabla -> tabla;
@@ -761,9 +761,9 @@ use Src\App\Database;
             if($pagina <= $paginas){
                 for($iteracion = 0; $iteracion < $pagina; $iteracion++){
                     if($iteracion != 0){
-                        $limiteInicial += $elementosPorPagina - 1;
+                        $limiteInicial += $elementosPorPagina;
+                        $limiteFinal += $elementosPorPagina;
                     }
-                    $limiteFinal += $elementosPorPagina;
                 }
             }
             
