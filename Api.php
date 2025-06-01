@@ -51,7 +51,7 @@ use Src\Controllers\UsuarioController;
             // Parametros de acciones
             $pagina = empty($request->__get('_pagina')) ? 1 : (int) $request->__get('_pagina');
 
-            if($accion != 'filtrar'){
+            if($accion != 'pais'){
                 $usuario = $request->__get('_user');
                 $aspirante = AspiranteController::obtenerAspirante($usuario);
             }
@@ -68,6 +68,8 @@ use Src\Controllers\UsuarioController;
                 "filtrar" => UsuarioController::locationFilter($request -> _pais,'pais'),
                 "seguidores" => UsuarioController::obtenerSeguidores($request -> _user),
                 "seguidos" => UsuarioController::obtenerSeguidos($request -> _user),
+                'seguir' => UsuarioController::seguir($request->_user),
+                'pais' => UsuarioController::locationFilter($request->_user, 'pais', $request->_pagina),
                 default => []
             };
 

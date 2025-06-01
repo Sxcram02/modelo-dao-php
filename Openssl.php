@@ -96,14 +96,14 @@
             }
 
             if(!is_array($datos)){
-                openssl_public_encrypt($datos,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_PADDING);
+                openssl_public_encrypt($datos,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_OAEP_PADDING);
                 $datoCodificado = self::encode($datoEncriptado,$base);
                 return $datoCodificado;
             }
 
 
             foreach($datos as $indice => $dato){
-                openssl_public_encrypt($dato,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_PADDING);
+                openssl_public_encrypt($dato,$datoEncriptado,self::$clavePublica,OPENSSL_PKCS1_OAEP_PADDING);
                 $datoCodificado = self::encode($datoEncriptado,$base);
                 $datos[$indice] = $datoCodificado;
             }
@@ -128,14 +128,14 @@
 
             if(!is_array($datos)){
                 $datoDescodificado = self::decode($datos,$base);
-                $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
+                $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_OAEP_PADDING);
 
                 return $estaDesencriptado ? $datoDesencriptado : '';
             }
 
             foreach($datos as $indice => $dato){
                 $datoDescodificado = self::decode($dato,$base);
-                $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_PADDING);
+                $estaDesencriptado = openssl_private_decrypt($datoDescodificado,$datoDesencriptado,self::$clavePrivada,OPENSSL_PKCS1_OAEP_PADDING);
                 $datos[$indice] = $estaDesencriptado ? $datoDesencriptado : '';
             }
 
@@ -168,8 +168,8 @@
                     default => base64_encode($datos)
                 };
 
-                $datos = preg_replace("#\/+#","@",$datos);
-                $datos = preg_replace('/\++/','*',$datos);
+                $datos = preg_replace("/\/+/","@",$datos);
+                $datos = preg_replace('/\+{1,}/','!',$datos);
 
                 if($base == "url"){
                     $datos = rawurlencode($datos);
@@ -179,14 +179,14 @@
             }
 
             foreach($datos as $indice => $dato){
-                if(!is_array($dato) && isset($dato) && !empty($dato)){
-                    $dato =match($base){
+                if(isset($dato) && !is_array($dato) && !empty($dato)){
+                    $dato = match($base){
                         "hexa" => hex2bin($dato),
                         default => base64_encode($dato)
                     };
 
-                    $dato = preg_replace("#\/+#","@",$dato);
-                    $dato = preg_replace('/\++/','*',$dato);
+                    $dato = preg_replace("/\/+/","@",$dato);
+                    $datos = preg_replace('/\+{1,}/','!',$datos);
 
                     if($base == "url"){
                         $datos[$indice] = rawurlencode($dato);
@@ -225,7 +225,7 @@
             }
             
             $datos = preg_replace("/\@+/", '/', $datos);
-            $datos = preg_replace("/\*+/", '+', $datos);
+            $datos = preg_replace("/\!+/", '+', $datos);
 
             $datos = match ($base) {
                 "hexa" => bin2hex($datos),
@@ -242,7 +242,7 @@
                 }
                 
                 $dato = preg_replace("/\@+/", '/', $dato);
-                $dato = preg_replace("/\*+/", '+', $dato);
+                $dato = preg_replace("/\!+/", '+', $dato);
 
                 $datos[$indice] = match ($base) {
                     "hexa" => bin2hex($dato),
@@ -281,7 +281,7 @@
                         return true;
                     }
 
-                    if(self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+]*={1,2}$)/",$dato)){
+                    if(self::existenCoincidencias("/([a-zA-Z0-9\/\r\n\+\@\!\_]*={1,2}$)/",$dato)){
                         return  true;
                     }
                 }
