@@ -233,7 +233,7 @@
             $parametros = $this -> parametros;
             $claves = $this -> claves;
             if(str_contains($this->consulta,'LIMIT')){
-                preg_match("/\bLIMIT\b\s([0-9]+)\,([0-9]+)?/",$this->consulta,$coincidencias);
+                preg_match("/\bLIMIT\b\s([0-9]+)(?:\,([0-9]+))?/",$this->consulta,$coincidencias);
                 
                 $limiteInicial = $coincidencias[1];
                 $limiteFinal = $coincidencias[2];

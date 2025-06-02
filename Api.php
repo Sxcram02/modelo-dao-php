@@ -73,8 +73,8 @@ use Src\Controllers\UsuarioController;
                 default => []
             };
 
-            if (is_object($resultados) && $resultados->isColeccion()) {
-                $resultados = $resultados->paginate($pagina) -> array();
+            if (is_object($resultados)) {
+                $resultados = ($resultados->isColeccion()) ? $resultados->paginate($pagina) -> array() : [$resultados -> array()];
             }
             
             (!$resultados) ? Route::cabeceraRespuesta(404,[]) : Route::cabeceraRespuesta(200,$resultados);
