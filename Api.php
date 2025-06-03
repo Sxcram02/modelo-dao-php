@@ -5,8 +5,8 @@
     use Src\Controllers\ExperienciaController;
     use Src\Controllers\FormacionController;
     use Src\Controllers\IdiomaController;
-use Src\Controllers\PublicacionController;
-use Src\Controllers\UsuarioController;
+    use Src\Controllers\PublicacionController;
+    use Src\Controllers\UsuarioController;
 
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -64,11 +64,12 @@ use Src\Controllers\UsuarioController;
                 "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni,$pagina),
                 "dni" => AspiranteController::buscarPorDni($request->_user),
                 "email" => UsuarioController::buscarPorEmail($request->_user),
-                "actividad" => UsuarioController::getActividad($request),
+                "actividad" => UsuarioController::getActividad(),
                 "filtrar" => UsuarioController::locationFilter($request -> _pais,'pais'),
                 "seguidores" => UsuarioController::obtenerSeguidores($request -> _user),
                 "seguidos" => UsuarioController::obtenerSeguidos($request -> _user),
                 'seguir' => UsuarioController::seguir($request->_user),
+                'guardado' => UsuarioController::obtenerPublicacionesGuardadas($request -> _user),
                 'pais' => UsuarioController::locationFilter($request->_user, 'pais', $request->_pagina),
                 default => []
             };

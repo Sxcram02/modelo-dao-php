@@ -209,7 +209,7 @@
          */
         private function obtenerParametrosUpdate(string $query): void {
 
-        $regexUpdate = "/\b(\w*) = (\'?[\w\@\.\-_\s\/áéíóúñö:ü\$]+\'?)\b/i";
+        $regexUpdate = "/(\w*) = (\'?[\@\.\\\-\_\:\$\/áéíóúñöü\w]+\'?)/i";
 
             if(str_contains($query,'WHERE')){
                 $posClausulaWhere = strpos($query,'WHERE');
@@ -252,7 +252,7 @@
             foreach ($parametros as $indice => $parametro) {
                 $nombreParametro = $claves[$indice];
 
-                if(!in_array($nombreParametro,["passUsuario"])){
+                if(!in_array( $nombreParametro,["passUsuario","perfilImage",'perfilBackground'])){
                     $parametro = self::filtrarContenido($parametro);
                 }
 
@@ -325,7 +325,7 @@
                 foreach ($parametrosPreparados as $nombreParametro => $detalles) {
                     $parametro = $detalles['valor'];
 
-                    if(self::existenCoincidencias("/[\Wñáéíóúñöü]+/i",$parametro)){
+                    if(self::existenCoincidencias("/[\@\.\\\-\_\:\$\/áéíóúñöü]+/i",$parametro)){
                         $regexEspecial = preg_quote($parametro,'/');
                         $consulta = preg_replace("/$regexEspecial/", $nombreParametro, $consulta,1);
                     }else{

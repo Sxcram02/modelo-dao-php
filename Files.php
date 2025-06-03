@@ -119,6 +119,20 @@
 				$resultado["mensaje"] = "El formato de los datos de la imagen, son incorrectos";
 				return $resultado;
 			}
+			
+			// Errores en la subida del archivo.
+			if($imagen["error"] != 0){
+				$resultado["resultado"] = false;
+				$resultado["mensaje"] = match($imagen["error"]){
+					UPLOAD_ERR_INI_SIZE => "El archivo excede los limites del servidor",
+					UPLOAD_ERR_FORM_SIZE => "El archivo excede el limite del formulario",
+					UPLOAD_ERR_PARTIAL => "El archivo esta dañado o incompleto",
+					UPLOAD_ERR_NO_FILE => "No se subio ningun archivo",
+					default => "Error en el servidor"
+				};
+
+				return $resultado;
+			}
 
 			// Tipo MIME valido.
 			if(!self::esUnTipoValido($imagen["type"])){
@@ -138,19 +152,6 @@
 				return $resultado;
 			}
 
-			// Errores en la subida del archivo.
-			if($imagen["error"] != 0){
-				$resultado["resultado"] = false;
-				$resultado["mensaje"] = match($imagen["error"]){
-					UPLOAD_ERR_INI_SIZE => "El archivo excede los limites del servidor",
-					UPLOAD_ERR_FORM_SIZE => "El archivo excede el limite del formulario",
-					UPLOAD_ERR_PARTIAL => "El archivo esta dañado o incompleto",
-					UPLOAD_ERR_NO_FILE => "No se subio ningun archivo",
-					default => "Error en el servidor"
-				};
-
-				return $resultado;
-			}
 
 			$tipoArchivo = match($imagen["type"]){
 				"image/jpeg" => "jpg",
