@@ -56,7 +56,6 @@
                 $aspirante = AspiranteController::obtenerAspirante($usuario);
             }
             
-            
             $resultados = match ($accion) {
                 "publicaciones" => PublicacionController::obtenerPublicaciones($usuario, $pagina),
                 "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni,$pagina),

@@ -17,6 +17,7 @@ use Src\App\Logs;
  */
 class Route implements Singelton {
     use GestorRutas;
+    use Openssl;
     
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -90,6 +91,8 @@ class Route implements Singelton {
      * @default []
      */
     private array $rutasApi = [];
+
+    private array $rutasEncriptadas = [];
 
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -269,7 +272,6 @@ class Route implements Singelton {
 
         return $this;
     }
-
 
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -461,6 +463,23 @@ class Route implements Singelton {
         return $this -> log;
     }
 
+    public function encrypted(string $rutaNueva = "") {
+        if(isset($rutaNueva) && !empty($rutaNueva)){
+            $rutaRegistrada = $rutaNueva;
+            $this -> rutaRegistrada = $rutaRegistrada;
+        }else{
+            $rutaRegistrada = $this -> rutaRegistrada;
+        }
+
+        $rutasEncriptadas = $this -> rutasEncriptadas;
+        if(isset($rutaRegistrada) && !empty($rutaRegistrada) && !$this -> esRutaEncriptada($rutaRegistrada)){
+            $rutasEncriptadas[] = $rutaRegistrada;
+            $this -> rutasEncriptadas = $rutasEncriptadas;
+        }
+
+        return $this;
+    }
+
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
      * @private
@@ -639,6 +658,21 @@ class Route implements Singelton {
 
         return false;
     }
+
+    private function esRutaEncriptada(string $rutaEnv): bool {
+        $rutasEncriptadas = $this -> rutasEncriptadas;
+        if(empty($rutasEncriptadas)){
+            return false;
+        }
+
+        foreach ($rutasEncriptadas as $ruta) {
+            if (self::sonMismaRuta( $rutaEnv,$ruta,true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
@@ -650,6 +684,7 @@ class Route implements Singelton {
      */
     private function esSolicitadaRutaValida($rutaEnv = null): bool {
         $sonLaMismaRuta = false;
+        $tieneEncriptacion = false;
         $tieneSesion = false;
         $tieneAccesoPermitido = true;
         $tieneRol = false;
@@ -675,20 +710,24 @@ class Route implements Singelton {
             $tieneAccesoPermitido = false;
         }
 
-        $sonLaMismaRuta = $isInitialRoute ? $rutaEnv == $rutaReq : self::sonMismaRuta($rutaReq,$rutaEnv);
-        
+        if(!$isInitialRoute && $this -> esRutaEncriptada($rutaEnv)){
+            $tieneEncriptacion = true;
+            $tieneAccesoPermitido = false;
+        }
 
-        if($tieneSesion){
+        $sonLaMismaRuta = $isInitialRoute ? $rutaEnv == $rutaReq : self::sonMismaRuta($rutaReq,$rutaEnv);
+
+        if($sonLaMismaRuta && $tieneSesion){
             $tieneAccesoPermitido = $this -> tienePermisoParaAcceder();
         }
 
-        if($tieneAccesoPermitido && $tieneRol){
+        if($sonLaMismaRuta && $tieneAccesoPermitido && $tieneRol){
             $rol = $this -> sesion -> get('_typeRol');
             $tieneAccesoPermitido = !isset($rol) ? false : $this -> esRolValido($rol,$rutaEnv);
         }
 
         if($sonLaMismaRuta && !$tieneAccesoPermitido){
-            header('HTTP/1.1 404 Not found');
+            header('HTTP/1.1 301 Forbbiden');
             header('Location: /');
             die;
         }
@@ -700,6 +739,16 @@ class Route implements Singelton {
         if($sonLaMismaRuta && !$tieneAccesoPermitido){
             header('HTTP/1.1 404 Not found');
             header('Location: /');
+            die;
+        }
+
+        if($tieneAccesoPermitido && $tieneEncriptacion){
+            $tieneAccesoPermitido = self::estaCodificado(rawurldecode($rutaReq));
+        }
+        
+        if($sonLaMismaRuta && !$tieneAccesoPermitido){
+            header('HTTP/1.1 301 Forbbiden');
+            header('Location: /perfil');
             die;
         }
 
@@ -750,7 +799,6 @@ class Route implements Singelton {
 
         return true;
     }
-
     
     /**
      * @author Sxcram02 ms2d0v4@gmail.com
