@@ -82,7 +82,7 @@
 
 			};
 			
-			$rutaDestino = "public\\$tipoArchivo\\$nombreArchivo";
+			$rutaDestino = "public/$tipoArchivo/$nombreArchivo";
 
 			$seMovio = move_uploaded_file($carpetaTemporal,$rutaDestino);
 			if(!$seMovio){

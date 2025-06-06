@@ -363,7 +363,7 @@
 		 * @author Sxcram02 ms2d0v4@gmail.com
 		 */
 		public function dni(string $dni): bool {
-			$regexDni = "/^[0-9]{8}[A-Z]{1}$/";
+			$regexDni = "/^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$/";
 			$longitudMaxima = 9;
 			$errores = self::$errores;
 
