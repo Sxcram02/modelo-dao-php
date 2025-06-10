@@ -130,7 +130,7 @@
          * @return void
          */
         private function getApacheLogs(bool $paginado = true): void  {
-            $logs = $this -> obtenerLogsArchivo('C:\xampp\apache\logs\access.log');
+            $logs = $this -> obtenerLogsArchivo('C:/xampp/htdocs/contratame/src/logs/request.log');
             $logs = $this -> formatearTextoLogs($logs);
             $totalLogs = count($logs);
             $this -> logsTotales = $totalLogs;
@@ -138,15 +138,15 @@
             foreach($logs as $indice => $log){
                 $logs[$indice] = [
                     'num' => $indice + 1,
-                    'ip_remota' => $log[0],
-                    'fecha' => $log[1],
-                    'metodo' => $log[2],
-                    'URI' => $log[3],
-                    'protocolo' => $log[4],
-                    'codigo' => $log[5],
-                    'pid' => $log[6],
-                    'URL' => $log[7],
-                    'agente' => $log[8]
+                    'ip_remota' => $log[0] ?? "",
+                    'fecha' => $log[1] ?? "",
+                    'metodo' => $log[2] ?? "",
+                    'URI' => $log[3] ?? "",
+                    'protocolo' => $log[4] ?? "",
+                    'codigo' => $log[5] ?? "",
+                    'pid' => $log[6] ?? "",
+                    'URL' => $log[7] ?? "",
+                    'agente' => $log[8] ?? ""
                 ];
             }
             
@@ -324,6 +324,7 @@
             $megaBytesArchivo = $kiloBytes / 1024;
 
             $bytesMaximosArchivo = $megaBytesArchivo >= 1.5 ? $megaBytesArchivo - ($megaBytesArchivo / 2) : $megaBytesArchivo; 
+            
             $bytesMaximosArchivo *= 1024;
             $bytesMaximosArchivo *= 1024;
 
@@ -355,12 +356,15 @@
         private function formatearTextoLogs(string $logs): array|bool{
             
             $logs = preg_replace('/\-\s\-/', '', $logs);
+            $regex ="/^(.*)\s*\[(.*)\]\s*\"(.*)\s+(.*)\s+(.*)\"\s*(\d+)\s*\"(.*)\"\s*(.*)/";
 
             $logs = preg_replace('/(?!^)(?=\b[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\b)/', '??', $logs);
             $logs = preg_split('/\?\?/',$logs);
 
             foreach($logs as $indice => $log){
-                $log = preg_replace("/(.+)?\s+\[(.+)\]\s+\"(.+)\s+(.+)\s+(.+)\"\s+(.+)\s+(.+)\s+\"(.+)?\"\s+\"(.+)?\"/","$1=$2=$3=$4=$5=$6=$7=$8=$9",$log);
+                $log = preg_replace($regex,"$1=$2=$3=$4=$5=$6=$7=$8=$9",$log);
+                $log = preg_replace("/\s{2,}/","",$log);
+
                 $log = preg_split("/\=/",$log);
                 // Tiene la información mínima
                 if(count($log) >= 9){

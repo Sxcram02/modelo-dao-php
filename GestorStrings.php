@@ -75,24 +75,27 @@
          * @param  string $elemento - un dati cuan sea
          * @return string
          */
-        public static function filtrarContenido(string $elemento): ?string {
-            
-            if(self::existenCoincidencias("/^\s+|\s+$/i",$elemento)){
-                $elemento = preg_replace("/^\s*/","",$elemento);
-                $elemento = preg_replace("/\s+$/","",$elemento);
-            }
+        public static function filtrarContenido(?string $elemento = ""): ?string {
 
-            if(self::existenCoincidencias("/[\`\'\´\(\)\[\{\}]+|\]+/",$elemento)){
-                $elemento = preg_replace("/[\`\'\´\(\)\[\{\}]+|\]+/","",$elemento);
+            if(isset($elemento)){
+                if(self::existenCoincidencias("/^\s+|\s+$/i",$elemento)){
+                    $elemento = preg_replace("/^\s*/","",$elemento);
+                    $elemento = preg_replace("/\s+$/","",$elemento);
+                }
+    
+                if(self::existenCoincidencias("/[\`\'\´\(\)\[\{\}]+|\]+/",$elemento)){
+                    $elemento = preg_replace("/[\`\'\´\(\)\[\{\}]+|\]+/","",$elemento);
+                }
+    
+                
+                if(self::existenCoincidencias("/(?![\wñáíóúüöÁÍÉÚÓÖÜ\_]+)/",$elemento)){
+                    $elemento = htmlspecialchars($elemento);
+                }
+    
+                $elemento = stripslashes($elemento);
             }
-
-            
-            if(self::existenCoincidencias("/(?![\wñáíóúüöÁÍÉÚÓÖÜ\_]+)/",$elemento)){
-                $elemento = htmlspecialchars($elemento);
-            }
-
-            $elemento = stripslashes($elemento);
             return $elemento;
+            
         }
 
         /**
