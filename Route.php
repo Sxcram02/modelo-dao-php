@@ -85,33 +85,6 @@ class Route implements Singelton {
     private array $rutasPermitidas = [];
 
     /**
-     * Un array con todas las rutas a las que el usuario no tiene permiso de acceder sin sesión.
-     * @var array
-     * @default []
-     * @private
-     * @author Sxcram02 <ms2d0v4@gmail.com>
-     */
-    private array $rutasConSesion = [];
-
-    /**
-     * Un array con todas las rutas a las que el usuario recibira una respuesta en json
-     * @var array
-     * @default []
-     * @private
-     * @author Sxcram02 <ms2d0v4@gmail.com>
-     */
-    private array $rutasApi = [];
-
-    /**
-     * Un array con todas las rutas que deben estar encriptadas
-     * @var array
-     * @default []
-     * @private
-     * @author Sxcram02 <ms2d0v4@gmail.com>
-     */
-    private array $rutasEncriptadas = [];
-
-    /**
      * Un cadena con la ruta registrada por el servidor.
      * @var ?string
      * @default null
@@ -262,7 +235,16 @@ class Route implements Singelton {
         $this->rutaRegistrada = $ruta;
         return $this;
     }
-
+    
+    /**
+     * controller
+     * Método encargado de asociar a cada ruta un controlador para su uso y descarte
+     * @param  string $controller - el nombre de la clase Src\Controllers\UsuarioController
+     * @param  callable $callable - función que agrupará rutas con dicho controlador
+     * @return void
+     * @todo controlar las rutas que tienen controlador asignado y las que no
+     * @author Sxcram02 <ms2d0v4@gmail.com>
+     */
     public function controller(string $controller, callable $callable) :void {
         $this -> controller = $controller;
         $callable();
@@ -619,52 +601,6 @@ class Route implements Singelton {
     }
 
     /**
-     * esRutaSinHeaderHtml
-     * Método que comprueba que la ruta pasada por parámetro coincide con alguna ruta que no reciba cabecera html
-     * @param  string $rutaEnv - generalmente la ruta de entorno del servidor
-     * @return bool
-     * @private
-     * @author Sxcram02 <ms2d0v4@gmail.com>
-     */
-    private function esRutaSinHeaderHtml(string $rutaEnv): bool {
-        $rutasApi = $this->rutasApi;
-        if (empty($rutasApi)) {
-            return false;
-        }
-
-        foreach ($rutasApi as $ruta) {
-            if (self::sonMismaRuta($rutaEnv, $ruta, true)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * esRutaEncriptada
-     * Método que comprueba que la ruta pasada por parámetro coincide con alguna ruta que deba estar encriptada
-     * @param  string $rutaEnv - generalmente la ruta de entorno del servidor
-     * @return bool
-     * @private
-     * @author Sxcram02 <ms2d0v4@gmail.com>
-     */
-    private function esRutaEncriptada(string $rutaEnv): bool {
-        $rutasEncriptadas = $this->rutasEncriptadas;
-        if (empty($rutasEncriptadas)) {
-            return false;
-        }
-
-        foreach ($rutasEncriptadas as $ruta) {
-            if (self::sonMismaRuta($rutaEnv, $ruta, true)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * esSolicitadaRutaValida
      * Método encargado de registrar, filtrar por dirctorios /home,/usuario y por sesiones (solicitada o no)  por acceso (permitido o no) retorna un true si la REQUES_URI cumple con todas estas condiciones
      * @param  mixed $rutaEnv - ruta que será registrada para el servidor
@@ -709,9 +645,7 @@ class Route implements Singelton {
         }
 
         if ($sonLaMismaRuta && !$tieneAccesoPermitido) {
-            header('HTTP/1.1 301 Forbbiden');
-            header('Location: /');
-            die;
+            redirect('/');
         }
 
         // Esa ruta esta registrada en el array
@@ -720,9 +654,7 @@ class Route implements Singelton {
         }
 
         if ($sonLaMismaRuta && !$tieneAccesoPermitido) {
-            header('HTTP/1.1 404 Not found');
-            header('Location: /');
-            die;
+            redirect('/');
         }
 
         // Esa ruta debe estar encriptada
@@ -731,9 +663,7 @@ class Route implements Singelton {
         }
 
         if ($sonLaMismaRuta && !$tieneAccesoPermitido) {
-            header('HTTP/1.1 301 Forbbiden');
-            header('Location: /perfil');
-            die;
+            redirect('/perfil');
         }
 
         return $sonLaMismaRuta && $tieneAccesoPermitido;
