@@ -8,6 +8,8 @@
          * Función que determina si una cadena esta en cifrada o no, comprobando si la cadena contiene caractéres que no son imprimibles, además de comprobar si la longitud de la cadena se corresponde con 2^4 hasta 2^10 como sulen ser lss cadebas cifradas.
          * @param string $cadena - cadena de texto que será analizada
          * @return bool
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
         public static function estaCifrada(string $cadena): bool {
             if (!ctype_print($cadena)){
@@ -21,11 +23,14 @@
             // Parece que no es una cadena cifrada.
             return false;
         }
+        
         /**
          * esCadenaTextoValida
          * Función qu recibe una cadena de texto y comprueba si el dato existe y no esta vacío.
          * @param  string $cadena - cadena de caractéres que será analizada.
          * @return bool
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
         public static function esCadenaTextoValida(string $cadena): bool {
             return (isset($cadena) && !empty($cadena)) ? true : false;
@@ -34,9 +39,10 @@
         /**
          * separarString
          * Función que recibe un pattern regex  comprueba que este un separador como "," o ";" o ":" o "-" existe en la cadena, si es asi separa la cadena en un array y en caso contrario retorna la cadena.
-         *
          * @param string $cadena
          * @return array|string
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
         public static function separarString(string $cadena,string $pattern = "/(?=.*[a-z]+)[,:;]/"): array|string {
             $separadores = [];
@@ -54,6 +60,8 @@
          * @param  string $buscado - el carácter buscado en una cadena.
          * @param  string $cadena - la cadena en la que se busca el carácter.
          * @return string|false
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
         public static function buscarString(string $buscado, string $cadena): int|false {
 
@@ -72,10 +80,14 @@
         /**
          * filtrarContenido
          * Función que recibe un objeto con la estructura de un objeto HTML y filtra su contenido en texto devuelve una cadena filtrada.
-         * @param  string $elemento - un dati cuan sea
+         * @param  string $elemento - un dato cual sea
+         * @param bool $esEstricto - variable que determina si pasar un filtro de comillas parentesis y caracteres raros
+         * @default true
          * @return string
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
-        public static function filtrarContenido(?string $elemento = ""): ?string {
+        public static function filtrarContenido(?string $elemento = "",bool $esEstricto = true): ?string {
 
             if(isset($elemento)){
                 if(self::existenCoincidencias("/^\s+|\s+$/i",$elemento)){
@@ -83,16 +95,21 @@
                     $elemento = preg_replace("/\s+$/","",$elemento);
                 }
     
-                if(self::existenCoincidencias("/[\`\'\´\(\)\[\{\}]+|\]+/",$elemento)){
-                    $elemento = preg_replace("/[\`\'\´\(\)\[\{\}]+|\]+/","",$elemento);
+                $regex = "/[\`\'\´\(\)[\{\}]+/";
+                if(self::existenCoincidencias($regex,$elemento)){
+                    $elemento = preg_replace($regex,"",$elemento);
+                }
+
+                $regex = "/[\>\<\=\+]+|(\bOR\b)+|(\bAND\b)+|(\bTRUE\b)+/i";
+                if(self::existenCoincidencias($regex,$elemento)){
+                    $elemento = preg_replace($regex,"",$elemento);
                 }
     
                 
-                if(self::existenCoincidencias("/(?![\wñáíóúüöÁÍÉÚÓÖÜ\_]+)/",$elemento)){
+                if($esEstricto && self::existenCoincidencias("/(?![\wñáíóúüöÁÍÉÚÓÖÜ\_]+)/",$elemento)){
                     $elemento = htmlspecialchars($elemento);
+                    $elemento = stripslashes($elemento);
                 }
-    
-                $elemento = stripslashes($elemento);
             }
             return $elemento;
             
@@ -106,6 +123,8 @@
          * @param  string $cadena - cadena que será analizada con el pattern.
          * @param  array $coincidencias - todas las coincidencias obtenidas en la cadena.
          * @return bool
+         * @static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
          */
         
         public static function existenCoincidencias(string $pattern,string $cadena,array &$coincidencias = []): bool {

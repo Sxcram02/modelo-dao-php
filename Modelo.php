@@ -6,76 +6,77 @@ use Src\App\Coleccion;
 use Src\App\Database;
 
     /**
-     * @author Sxcram02 ms2d0v4@gmail.com
-     * @abstract
      * Modelo
      * Clase abstracta que será usada por los modelos para obtener, crear y modificar los registros de la base de datos con los controladores.
+     * @abstract
+     * @use GestorStrings
+     * @author Sxcram02 ms2d0v4@gmail.com
      */
     abstract class Modelo {
         use GestorStrings;
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Cadena de texto con la indicas el nombre de la tabla si el nombre de la clase no corresponde con esta.
-         * @protected
-         * @static
          * @var ?string
          * @default null
+         * @protected
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         protected ?string $tabla = null;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Cadena de texto con el que indicas la abreviación de la tabla.
-         * @protected
-         * @static
          * @var ?string
          * @default null
+         * @protected
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         protected ?string $abreviacionTabla = null;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Instancia de la base de datos que realizará las consultas.
+         * @var ?Database
+         * @default null
          * @private
          * @static
-         * @var Database
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private static ?Database $database = null;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Cadena con la consulta realizada usa para la formación dinámica de esta misma.
-         * @private
-         * @static
          * @var ?string
          * @default null
+         * @private
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private ?string $consulta = null;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Último id insertado en caso de estar setado
          * @var int
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public int $ultimoIdInsertado;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * Un array con todas las columnas que deseas setear en el objeto
          * @protected
          * @var ?array
          * @default null
+         * @protected
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         protected ?array $columnas = null;
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @private
          * __construct
          *  Método mágico constructor de la plantilla Modelo que setea la variable self::$tabla tomando el nombre de clase instanciada y formateandolo para la consulta SQL, además setea la conexión a la BBDD de forma privada y con una única instancia.
          * @return void
          * @throws \Exception Tabla no encontrada
          * @throws \Exception Conexión con la base de datos nula
+         * @private
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function __construct() {
             // Formateo el nombre de la clase Usuarios -> usuarios
@@ -103,13 +104,13 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * createObjects
          * Método que toma un array de registros e instancia una clase con las columnas de los registros recibidos.
-         * @todo Solucionar la creación dinámica de atributos. (deprecated php-8.3)
          * @param array $registro - array asoc
          * @return object|false
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
+         * @todo Solucionar la creación dinámica de atributos. (deprecated php-8.3)
          */
         public static function createModel(array $registro): object|false {
             $modelo = false;
@@ -132,14 +133,14 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * create
          * Método qu recibe un array assoc cuyas claves son las columnas de la tabla y su valor retorna false si falla o un objeto de la tabla con los valores.
-         * @todo función con arrays númericos.
          * 
          * @param  array $columnas - un array de las columnas necesarias para crear el modelo de la base de datos.
          * @return object|false
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
+         * @todo función con arrays númericos.
          */
         public static function create(array $columnas): object|false {
             $object = new static();
@@ -176,14 +177,14 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * update
          * Método que recibe las columnas y el id del registro a actualizar
          * @param  array $columnas
          * @default []
          * @param  int|string|array $id
          * @return bool
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public static function update(array $columnas = [], int|string|array $id): bool {
             $object = new static();
@@ -230,11 +231,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * delete
          * Método que recibe el id del registro a eliminar retorna un true o false
          * @param  int|string|array $id - el id o ids del registro
          * @return bool
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public static function delete(int|string|array $id): bool {
             if (empty($id)) {
@@ -284,12 +286,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * select
          * Método que toma un array ['columna1','columna2',...] o un string con formato columna1,columna2,...se le asignará un alias con las 3 primeras letras de la tabla a cada columna, si encuentra resultados devolverá un objeto con todos los resultados.
          * @param  string|array $columnas - un string con formato columna1,columna2 o un array con las columnas.
          * @return object|false
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public static function select(string|array $columnas) : object|false {
             $object = new static();
@@ -341,12 +343,12 @@ use Src\App\Database;
         }
         
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * exists
          * Método encargado que a partir de un array asociativo retorna si ese registro existe o no 
          * @param  array $datos
          * @return bool
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public static function exists(array $datos): bool {
 
@@ -369,12 +371,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @static
          * findById
          * Método encargado de obtener un modelo en base a su id o ids
          * @param  mixed $id
          * @return object|false
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public static function findById(mixed $id): object|false {
             $object = new static();
@@ -398,7 +400,6 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * join
          * Método que necesita tener una consulta previa, la cual es recogida de forma estática y obtiene la tabla de esta misma consulta, recibe como parámetro la tabla a la que va a ser unida y como segundo parametro un array de claves foraneas ['tabl.clave1','tab.clave2',...] o una cadena con formato 'tabk.clave1,tab.clave2,...' y unira a la consulta anterior y realizará la nueva union retornando un objeto con todos los resultados.
          * @todo Seleccionar la abrevicion personalizada (no recomendable).
@@ -407,6 +408,7 @@ use Src\App\Database;
          * @param string $tabla - cadena con la tabla a la que seá unida la consulta
          * @param string|array $claveForaneas - una cadena con formato clave1,clave2 o un array no asoc de estas.
          * @return ?object
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function join(string $tablaUnida, string|array $clavesForaneas): ?object {
             $tablaOriginal = $this -> formatTabla();
@@ -464,13 +466,13 @@ use Src\App\Database;
         }
         
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * where
          * Método que necesita de una consulta previa para funcionar, toma tre parámetros las columnas que van a ser evaluadas, uno o mas operadores para cada condición, el último se aplica a todas las demás
          * @param  string|array $columnas
          * @param  string|array $operador
          * @param  mixed $condicion
          * @return object
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function where(string|array $columnas, string|array $operador, mixed $condicion): object {
             foreach(func_get_args() as $parametro){
@@ -538,10 +540,10 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * json
          * Método encargado de retornar un json con las columnas de datos que no sea el id o la fehca de creación y actualización del registro
          * @return bool|string
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function json():bool|string {
             $columnas = $this -> columnas;
@@ -556,10 +558,10 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * array
          * Método que retorna un array con todos los atributos de la clase instanciada
          * @return array
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function array():array {
             $atributos = [];
@@ -574,40 +576,41 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * get
          * Método encargado de ejecutar la consulta formada con la instancia
          * @return bool|object
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function get(): bool|object {
             return $this -> execute();
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * isColeccion
          * Método que comprueba si la clase instanciada es una Coleccion 
          * @return bool
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function isColeccion(): bool {
             return $this instanceof Coleccion;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * getCreatedDate
          * Método encargado de generar una fecha con formato dinamico en segundos, minutos, horas, dias, meses o años
          * @return Fecha
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function getCreatedDate(): Fecha{
+            // Método llamado por la clase que herede de Modelo
             return new Fecha($this -> __get('created_at'));
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * count
          * Método que realiza una consulta para comprobar la cuenta de registros en la base de datos
          * @return int|false
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function count(): int|false {
             $tabla = $this -> tabla;
@@ -643,12 +646,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * limit
          * Método encargado de limitar la consulta formulada previamente
          * @param  int $limite
          * @default 10
          * @return object|false
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function limit(int $limite = 10): object|false {
             $consulta = $this -> consulta;
@@ -669,11 +672,11 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * isSame
          * Método encargado de comprobar que un modelo pasado por parámetro es igual que el actualmente instanciado
          * @param  object $modelo
          * @return bool
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function isSame(object $modelo):bool {
             $registroActual = $this;
@@ -707,12 +710,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
          * orderby
          * Método encargado de setear la consulta según el nombre de la columna pasada por parametro y el orden asc o desc
          * @param  string $columna
          * @param  string $orden
          * @return object
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         public function orderby(string $columna,string $orden):object {
             $consulta = $this -> consulta;
@@ -738,7 +741,17 @@ use Src\App\Database;
             return $this;
         }
 
-        public function paginate($pagina = 1,$elementosPorPagina = 4){
+        /**
+         * paginate
+         * Método que recibe como primer parámetro el número de la página que se va a mostrar y como segundo parámetro el número de objetos por página, a partir de este calcula cual es el limite incial y cual el final retorna el objeto con la clausula LIMIT
+         * @param int $pagina - número de página
+         * @default 1
+         * @param int $elementosPorPagina
+         * @default 4
+         * @return static
+         * @author Sxcram02 <ms2d0v4@gmail.com>
+         */
+        public function paginate($pagina = 1,$elementosPorPagina = 4): static{
             $consulta = $this -> consulta;
             $limiteInicial = 0;
             $limiteFinal = $elementosPorPagina;
@@ -807,11 +820,11 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @private
          * formatTabla
          * Método que determina el nombre y abreviación de la tabla actual
          * @return string - Una cadena en formato "tabla tab"
+         * @private
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function formatTabla(): string {
             $tieneWhere = strpos($this -> consulta,'WHERE');
@@ -836,12 +849,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @private
          * setColumnas
          * Método que si la clase tiene columnas seteadas las crea de forma dinámica, si no las crea según sus columnas de la base de datos.
          * @param string $tabla
          * @return void
+         * @private
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         private function setColumnas(string $tabla): void {
             if ($this -> columnas !== null) {
@@ -864,12 +877,12 @@ use Src\App\Database;
         }
 
         /**
-         * @author Sxcram02 ms2d0v4@gmail.com
-         * @protected
-         * @static
          * obtenerIdTabla
          * Método encargado de obtener el id o ids de la tabla
          * @return mixed
+         * @protected
+         * @static
+         * @author Sxcram02 ms2d0v4@gmail.com
          */
         protected static function obtenerIdTabla(): mixed  {
             $ids = [];
