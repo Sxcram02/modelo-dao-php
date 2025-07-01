@@ -211,7 +211,7 @@ final class Consulta {
      */
     private function obtenerParametrosUpdate(string $query): void {
 
-        $regexUpdate = "/(\w*) = (\'?[\@\.\\\-\_\:\$\/áéíóúñöü\s\w]+\'?(?!\s+[A-Z]+))/i";
+        $regexUpdate = "/(\w*) = (\'?[\@\.\\\-\_\:\$\/áéíóúñöü\s\:\w]+\'?(?!\s+[A-Z]+))/i";
 
         if (str_contains($query, 'WHERE')) {
             $posClausulaWhere = strpos($query, 'WHERE');

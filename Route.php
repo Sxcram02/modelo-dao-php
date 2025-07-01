@@ -274,7 +274,7 @@ class Route implements Singelton {
         if ($this -> esSolicitadaRutaValida($rutaEnv)) {
             self::$encontroRuta = true;
 
-            if (!self::$estaSeteadaLaCabecera && $rutas[$rutaEnv]['tieneHeaderHtml'] === true) {
+            if (!self::$estaSeteadaLaCabecera && $rutas[$rutaEnv]['tieneHeaderHtml'] | $isInitialRoute) {
                 require_once RUTA_COMPONENTES . 'head.php';
                 self::$estaSeteadaLaCabecera = true;
             }

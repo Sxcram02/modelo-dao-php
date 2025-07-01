@@ -228,7 +228,7 @@ trait Openssl
 
             $datos = match ($base) {
                 "hexa" => bin2hex($datos),
-                default => base64_decode($datos)
+                default => base64_decode($datos,true)
             };
 
             return $datos;

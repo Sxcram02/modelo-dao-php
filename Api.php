@@ -61,18 +61,17 @@ class Api implements Singelton {
 
         $resultados = match ($accion) {
             "publicaciones" => PublicacionController::obtenerPublicaciones($usuario, $pagina),
-            "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $aspirante->dni, $pagina),
-            "formaciones" => FormacionController::obtenerFormaciones($usuario, $aspirante->dni, $pagina),
-            "idiomas" => IdiomaController::obtenerIdiomas($usuario, $aspirante->dni, $pagina),
+            "experiencias" => ExperienciaController::obtenerExperiencias($usuario, $pagina),
+            "formaciones" => FormacionController::obtenerFormaciones($usuario, $pagina),
+            "idiomas" => IdiomaController::obtenerIdiomas($usuario, $pagina),
             "dni" => AspiranteController::buscarPorDni($request->_user),
             "email" => UsuarioController::existeEmail($request->_user),
             "actividad" => UsuarioController::getActividad(),
-            "filtrar" => UsuarioController::locationFilter($request->_pais, 'pais'),
+            "filtrar","pais" => UsuarioController::locationFilter($request->_user, 'pais', !isset($request->_pagina) || empty($request->_pagina) ? 1 : $request->_pagina),
             "seguidores" => UsuarioController::obtenerSeguidores($request->_user),
             "seguidos" => UsuarioController::obtenerSeguidos($request->_user),
             'seguir' => UsuarioController::seguir($request->_user),
             'guardado' => UsuarioController::obtenerPublicacionesGuardadas($request->_user),
-            'pais' => UsuarioController::locationFilter($request->_user, 'pais', !isset($request->_pagina) || empty($request->_pagina) ? 1 : $request->_pagina),
             default => []
         };
 
